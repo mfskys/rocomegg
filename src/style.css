@@ -1,0 +1,132 @@
+@import url("https://fonts.googleapis.com/css2?family=Epilogue:wght@700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap");
+
+:root {
+    /* Brand */
+    --rk-primary: #5140b3;
+    --rk-primary-soft: #6a5acd;
+    --rk-secondary: #6c49b2;
+    --rk-accent: #ffd700;
+
+    /* Surfaces */
+    --rk-bg-1: #faf8ff;
+    --rk-bg-2: #eeedf5;
+    --rk-surface: #ffffff;
+    --rk-surface-soft: #f4f3fb;
+    --rk-border-soft: rgba(201, 196, 213, 0.5);
+
+    /* Text */
+    --rk-text: #1a1b21;
+    --rk-text-soft: #474553;
+    --rk-text-muted: #787584;
+
+    /* Radius & Shadow */
+    --rk-radius-sm: 12px;
+    --rk-radius-md: 16px;
+    --rk-radius-lg: 24px;
+    --rk-shadow: 0 20px 40px rgba(81, 64, 179, 0.08);
+
+    font-family:
+        "Plus Jakarta Sans",
+        system-ui,
+        -apple-system,
+        Segoe UI,
+        Roboto,
+        sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
+    color: var(--rk-text);
+    background-color: var(--rk-bg-1);
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    /* Element Plus 基础主题变量 */
+    --el-color-primary: var(--rk-primary);
+    --el-border-radius-base: var(--rk-radius-md);
+    --el-font-family:
+        "Plus Jakarta Sans", system-ui, -apple-system, Segoe UI, Roboto,
+        sans-serif;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+    min-height: 100%;
+    margin: 0;
+}
+
+body {
+    background:
+        radial-gradient(
+            circle at top left,
+            rgba(106, 90, 205, 0.16),
+            transparent 36%
+        ),
+        radial-gradient(
+            circle at 90% 85%,
+            rgba(255, 215, 0, 0.12),
+            transparent 30%
+        ),
+        linear-gradient(180deg, var(--rk-bg-1), var(--rk-bg-2));
+    color: var(--rk-text);
+}
+
+/* 标题采用更有“奇幻感”的字体 */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin: 0;
+    font-family: "Epilogue", "Plus Jakarta Sans", sans-serif;
+    color: var(--rk-primary);
+    letter-spacing: 0.2px;
+}
+
+p {
+    margin: 0;
+    color: var(--rk-text-soft);
+}
+
+a {
+    color: var(--rk-primary);
+    text-decoration: none;
+}
+a:hover {
+    color: var(--rk-secondary);
+}
+
+/* 通用卡片基调（可在组件中直接复用） */
+.rk-card {
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid var(--rk-border-soft);
+    border-radius: var(--rk-radius-lg);
+    box-shadow: var(--rk-shadow);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+/* 更柔和的滚动条 */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(81, 64, 179, 0.35) transparent;
+}
+*::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+    background: rgba(81, 64, 179, 0.35);
+    border-radius: 999px;
+}
+*::-webkit-scrollbar-track {
+    background: transparent;
+}
