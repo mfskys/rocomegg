@@ -284,7 +284,7 @@ onMounted(loadDataset)
 <template>
   <div class="page">
     <header class="hero">
-      <h1>洛克王国世界精灵蛋查询</h1>
+      <h1>洛克王国世界精灵蛋查询站</h1>
       <p>输入蛋直径（m）和蛋重量（kg），查询可能孵化的候选精灵</p>
 
     </header>
