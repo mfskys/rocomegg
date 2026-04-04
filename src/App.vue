@@ -318,6 +318,7 @@ onMounted(loadDataset)
           </div>
 
           <div class="actions">
+            <el-button class="reset-btn" size="large" :icon="Refresh" @click="onReset">重置</el-button>
             <el-button
               class="query-btn"
               type="primary"
@@ -328,7 +329,6 @@ onMounted(loadDataset)
             >
               立即查询
             </el-button>
-            <el-button class="reset-btn" size="large" :icon="Refresh" @click="onReset">重置</el-button>
           </div>
         </el-form>
       </section>
@@ -436,7 +436,9 @@ onMounted(loadDataset)
 .actions {
   display: flex;
   gap: 12px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  width: 100%;
 }
 .query-btn {
   border-radius: 999px !important;
