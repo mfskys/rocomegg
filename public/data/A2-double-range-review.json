@@ -1,0 +1,219 @@
+[
+  {
+    "pet": "锤头鹳",
+    "rows": [
+      {
+        "id": 21,
+        "eggDiameter": "0.55~0.80",
+        "eggWeight": "6.0~9.0",
+        "type": "range"
+      },
+      {
+        "id": 22,
+        "eggDiameter": "0.5-0.63",
+        "eggWeight": "19.72-26.321",
+        "type": "range"
+      },
+      {
+        "id": 222,
+        "eggDiameter": "0.5",
+        "eggWeight": "19.72",
+        "type": "exact"
+      }
+    ]
+  },
+  {
+    "pet": "恶魔狼",
+    "rows": [
+      {
+        "id": 45,
+        "eggDiameter": "0.55~0.78",
+        "eggWeight": "6.5~9.5",
+        "type": "range"
+      },
+      {
+        "id": 46,
+        "eggDiameter": "0.57-0.73",
+        "eggWeight": "28.466-36.709",
+        "type": "range"
+      },
+      {
+        "id": 209,
+        "eggDiameter": "0.73",
+        "eggWeight": "36.709",
+        "type": "exact"
+      },
+      {
+        "id": 210,
+        "eggDiameter": "0.73",
+        "eggWeight": "36.403",
+        "type": "exact"
+      }
+    ]
+  },
+  {
+    "pet": "海枝枝",
+    "rows": [
+      {
+        "id": 63,
+        "eggDiameter": "0.32-0.34",
+        "eggWeight": "0.354-2.373",
+        "type": "range"
+      },
+      {
+        "id": 64,
+        "eggDiameter": "0.50~0.70",
+        "eggWeight": "4.5~7.0",
+        "type": "range"
+      }
+    ]
+  },
+  {
+    "pet": "记忆石",
+    "rows": [
+      {
+        "id": 81,
+        "eggDiameter": "0.44-0.58",
+        "eggWeight": "33.61-44.38",
+        "type": "range"
+      },
+      {
+        "id": 82,
+        "eggDiameter": "0.60~0.85",
+        "eggWeight": "10.0~15.0",
+        "type": "range"
+      },
+      {
+        "id": 196,
+        "eggDiameter": "0.58",
+        "eggWeight": "44.38",
+        "type": "exact"
+      }
+    ]
+  },
+  {
+    "pet": "菊花梨",
+    "rows": [
+      {
+        "id": 87,
+        "eggDiameter": "0.31-0.36",
+        "eggWeight": "1.785-2.32",
+        "type": "range"
+      },
+      {
+        "id": 88,
+        "eggDiameter": "0.50~0.70",
+        "eggWeight": "4.5~7.0",
+        "type": "range"
+      }
+    ]
+  },
+  {
+    "pet": "里拉鳐",
+    "rows": [
+      {
+        "id": 103,
+        "eggDiameter": "0.41-0.44",
+        "eggWeight": "14.782-19.8",
+        "type": "range"
+      },
+      {
+        "id": 104,
+        "eggDiameter": "0.55~0.80",
+        "eggWeight": "6.0~9.0",
+        "type": "range"
+      }
+    ]
+  },
+  {
+    "pet": "灵狐",
+    "rows": [
+      {
+        "id": 107,
+        "eggDiameter": "0.29-0.3",
+        "eggWeight": "3.123-3.179",
+        "type": "range"
+      },
+      {
+        "id": 108,
+        "eggDiameter": "0.52~0.75",
+        "eggWeight": "5.5~8.0",
+        "type": "range"
+      }
+    ]
+  },
+  {
+    "pet": "螺旋帕帕",
+    "rows": [
+      {
+        "id": 113,
+        "eggDiameter": "0.15-0.19",
+        "eggWeight": "0.812-1.74",
+        "type": "range"
+      },
+      {
+        "id": 114,
+        "eggDiameter": "0.55~0.80",
+        "eggWeight": "6.0~9.0",
+        "type": "range"
+      }
+    ]
+  },
+  {
+    "pet": "兽花蕾",
+    "rows": [
+      {
+        "id": 143,
+        "eggDiameter": "0.152-0.18",
+        "eggWeight": "1.559-2.6",
+        "type": "range"
+      },
+      {
+        "id": 144,
+        "eggDiameter": "0.45~0.65",
+        "eggWeight": "3.5~6.0",
+        "type": "range"
+      }
+    ]
+  },
+  {
+    "pet": "小独角兽",
+    "rows": [
+      {
+        "id": 154,
+        "eggDiameter": "0.44-0.59",
+        "eggWeight": "2.857-22.234",
+        "type": "range"
+      },
+      {
+        "id": 155,
+        "eggDiameter": "0.60~0.85",
+        "eggWeight": "8.0~12.0",
+        "type": "range"
+      }
+    ]
+  },
+  {
+    "pet": "锥尾羊",
+    "rows": [
+      {
+        "id": 188,
+        "eggDiameter": "0.26-0.33",
+        "eggWeight": "5.057-6.345",
+        "type": "range"
+      },
+      {
+        "id": 189,
+        "eggDiameter": "0.50~0.72",
+        "eggWeight": "5.0~7.5",
+        "type": "range"
+      },
+      {
+        "id": 224,
+        "eggDiameter": "0.26",
+        "eggWeight": "5.057",
+        "type": "exact"
+      }
+    ]
+  }
+]

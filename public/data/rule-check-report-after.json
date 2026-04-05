@@ -1,0 +1,66 @@
+{
+  "summary": {
+    "totalPets": 204,
+    "issuePets": 8,
+    "rangeCountNot1": 8,
+    "exactOutsideRange": 0
+  },
+  "issues": [
+    {
+      "pet": "阿米樱",
+      "type": "range_count_not_1",
+      "rangeCount": 0,
+      "rangeIds": [],
+      "exactCount": 1
+    },
+    {
+      "pet": "白金独角兽",
+      "type": "range_count_not_1",
+      "rangeCount": 0,
+      "rangeIds": [],
+      "exactCount": 1
+    },
+    {
+      "pet": "粉粉星",
+      "type": "range_count_not_1",
+      "rangeCount": 0,
+      "rangeIds": [],
+      "exactCount": 1
+    },
+    {
+      "pet": "梦游",
+      "type": "range_count_not_1",
+      "rangeCount": 0,
+      "rangeIds": [],
+      "exactCount": 1
+    },
+    {
+      "pet": "棋棋",
+      "type": "range_count_not_1",
+      "rangeCount": 0,
+      "rangeIds": [],
+      "exactCount": 1
+    },
+    {
+      "pet": "权杖-Ⅱ",
+      "type": "range_count_not_1",
+      "rangeCount": 0,
+      "rangeIds": [],
+      "exactCount": 1
+    },
+    {
+      "pet": "小甲虫",
+      "type": "range_count_not_1",
+      "rangeCount": 0,
+      "rangeIds": [],
+      "exactCount": 2
+    },
+    {
+      "pet": "雪蛮人",
+      "type": "range_count_not_1",
+      "rangeCount": 0,
+      "rangeIds": [],
+      "exactCount": 1
+    }
+  ]
+}

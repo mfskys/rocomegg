@@ -1,5 +1,5 @@
 {
-  "total": 287,
+  "total": 276,
   "items": [
     {
       "id": 1,
@@ -33,8 +33,8 @@
     },
     {
       "id": 6,
-      "eggDiameter": "0.50~0.72",
-      "eggWeight": "5.0~7.5",
+      "eggDiameter": "0.5~0.72",
+      "eggWeight": "5~7.5",
       "pet": "斑枭"
     },
     {
@@ -58,19 +58,19 @@
     {
       "id": 10,
       "eggDiameter": "0.55~0.75",
-      "eggWeight": "5.0~8.0",
+      "eggWeight": "5~8",
       "pet": "蹦蹦花"
     },
     {
       "id": 11,
       "eggDiameter": "0.47~0.68",
-      "eggWeight": "3.5~6.0",
+      "eggWeight": "3.5~6",
       "pet": "蹦床松鼠"
     },
     {
       "id": 12,
-      "eggDiameter": "0.65~0.90",
-      "eggWeight": "9.0~13.0",
+      "eggDiameter": "0.65~0.9",
+      "eggWeight": "9~13",
       "pet": "冰钻布鲁斯"
     },
     {
@@ -81,14 +81,14 @@
     },
     {
       "id": 14,
-      "eggDiameter": "0.75~1.00",
-      "eggWeight": "14.0~20.0",
+      "eggDiameter": "0.75~1",
+      "eggWeight": "14~20",
       "pet": "波多西"
     },
     {
       "id": 15,
-      "eggDiameter": "0.70~0.95",
-      "eggWeight": "14.0~20.0",
+      "eggDiameter": "0.7~0.95",
+      "eggWeight": "14~20",
       "pet": "布克棱岩"
     },
     {
@@ -100,13 +100,13 @@
     {
       "id": 17,
       "eggDiameter": "0.52~0.75",
-      "eggWeight": "5.0~7.5",
+      "eggWeight": "5~7.5",
       "pet": "怖哭菇"
     },
     {
       "id": 18,
       "eggDiameter": "0.58~0.82",
-      "eggWeight": "7.0~10.0",
+      "eggWeight": "7~10",
       "pet": "彩蝶鲨"
     },
     {
@@ -118,25 +118,19 @@
     {
       "id": 20,
       "eggDiameter": "0.68~0.92",
-      "eggWeight": "10.0~14.0",
+      "eggWeight": "10~14",
       "pet": "炽心勇狮"
     },
     {
       "id": 21,
-      "eggDiameter": "0.55~0.80",
-      "eggWeight": "6.0~9.0",
-      "pet": "锤头鹳"
-    },
-    {
-      "id": 22,
-      "eggDiameter": "0.5-0.63",
+      "eggDiameter": "0.5~0.8",
       "eggWeight": "19.72-26.321",
       "pet": "锤头鹳"
     },
     {
       "id": 23,
       "eggDiameter": "0.48~0.68",
-      "eggWeight": "4.5~7.0",
+      "eggWeight": "4.5~7",
       "pet": "春花兔"
     },
     {
@@ -147,8 +141,8 @@
     },
     {
       "id": 25,
-      "eggDiameter": "0.55~0.80",
-      "eggWeight": "6.0~9.0",
+      "eggDiameter": "0.55~0.8",
+      "eggWeight": "6~9",
       "pet": "翠顶夫人"
     },
     {
@@ -213,8 +207,8 @@
     },
     {
       "id": 36,
-      "eggDiameter": "0.50~0.72",
-      "eggWeight": "5.0~7.5",
+      "eggDiameter": "0.5~0.72",
+      "eggWeight": "5~7.5",
       "pet": "叮叮恶魔"
     },
     {
@@ -250,7 +244,7 @@
     {
       "id": 42,
       "eggDiameter": "0.45~0.65",
-      "eggWeight": "3.5~6.0",
+      "eggWeight": "3.5~6",
       "pet": "嘟嘟锅"
     },
     {
@@ -268,12 +262,6 @@
     {
       "id": 45,
       "eggDiameter": "0.55~0.78",
-      "eggWeight": "6.5~9.5",
-      "pet": "恶魔狼"
-    },
-    {
-      "id": 46,
-      "eggDiameter": "0.57-0.73",
       "eggWeight": "28.466-36.709",
       "pet": "恶魔狼"
     },
@@ -286,7 +274,7 @@
     {
       "id": 48,
       "eggDiameter": "0.196-0.28",
-      "eggWeight": "12.61-14.72",
+      "eggWeight": "11.2-14.72",
       "pet": "翡翠水母"
     },
     {
@@ -303,14 +291,14 @@
     },
     {
       "id": 51,
-      "eggDiameter": "0.50~0.72",
-      "eggWeight": "5.0~7.5",
+      "eggDiameter": "0.5~0.72",
+      "eggWeight": "5~7.5",
       "pet": "高脚鹬"
     },
     {
       "id": 52,
       "eggDiameter": "0.48~0.68",
-      "eggWeight": "4.0~6.5",
+      "eggWeight": "4~6.5",
       "pet": "格兰球"
     },
     {
@@ -322,7 +310,7 @@
     {
       "id": 54,
       "eggDiameter": "0.18~0.68",
-      "eggWeight": "1~1.576",
+      "eggWeight": "0.894~1.576",
       "pet": "公平鸽"
     },
     {
@@ -357,8 +345,8 @@
     },
     {
       "id": 60,
-      "eggDiameter": "0.55~0.80",
-      "eggWeight": "7.0~11.0",
+      "eggDiameter": "0.55~0.8",
+      "eggWeight": "7~11",
       "pet": "海豹船长"
     },
     {
@@ -376,19 +364,13 @@
     {
       "id": 63,
       "eggDiameter": "0.32-0.34",
-      "eggWeight": "0.354-2.373",
-      "pet": "海枝枝"
-    },
-    {
-      "id": 64,
-      "eggDiameter": "0.50~0.70",
-      "eggWeight": "4.5~7.0",
+      "eggWeight": "1.881-2.373",
       "pet": "海枝枝"
     },
     {
       "id": 65,
-      "eggDiameter": "0.50~0.75",
-      "eggWeight": "5.0~9.0",
+      "eggDiameter": "0.5~0.75",
+      "eggWeight": "5~9",
       "pet": "寒音蛇"
     },
     {
@@ -400,13 +382,13 @@
     {
       "id": 67,
       "eggDiameter": "0.58~0.82",
-      "eggWeight": "7.0~10.0",
+      "eggWeight": "7~10",
       "pet": "黑羽夫人"
     },
     {
       "id": 68,
       "eggDiameter": "0.45~0.65",
-      "eggWeight": "3.5~6.0",
+      "eggWeight": "3.5~6",
       "pet": "红绒十字"
     },
     {
@@ -430,13 +412,13 @@
     {
       "id": 72,
       "eggDiameter": "0.45~0.65",
-      "eggWeight": "3.5~6.0",
+      "eggWeight": "3.5~6",
       "pet": "花衣蝶"
     },
     {
       "id": 73,
       "eggDiameter": "0.45~0.65",
-      "eggWeight": "3.5~6.0",
+      "eggWeight": "3.5~6",
       "pet": "化蝶"
     },
     {
@@ -447,20 +429,20 @@
     },
     {
       "id": 75,
-      "eggDiameter": "0.50~0.70",
-      "eggWeight": "4.5~7.0",
+      "eggDiameter": "0.5~0.7",
+      "eggWeight": "4.5~7",
       "pet": "幻影灵菇"
     },
     {
       "id": 76,
-      "eggDiameter": "0.60~0.85",
-      "eggWeight": "8.0~12.0",
+      "eggDiameter": "0.6~0.85",
+      "eggWeight": "8~12",
       "pet": "皇家狮鹫"
     },
     {
       "id": 77,
-      "eggDiameter": "0.50~0.70",
-      "eggWeight": "5.0~8.0",
+      "eggDiameter": "0.5~0.7",
+      "eggWeight": "5~8",
       "pet": "火神"
     },
     {
@@ -471,8 +453,8 @@
     },
     {
       "id": 79,
-      "eggDiameter": "0.60~0.85",
-      "eggWeight": "9.0~13.0",
+      "eggDiameter": "0.6~0.85",
+      "eggWeight": "9~13",
       "pet": "火焰猿"
     },
     {
@@ -483,38 +465,32 @@
     },
     {
       "id": 81,
-      "eggDiameter": "0.44-0.58",
+      "eggDiameter": "0.44-0.85",
       "eggWeight": "33.61-44.38",
       "pet": "记忆石"
     },
     {
-      "id": 82,
-      "eggDiameter": "0.60~0.85",
-      "eggWeight": "10.0~15.0",
-      "pet": "记忆石"
-    },
-    {
       "id": 83,
-      "eggDiameter": "0.75~1.00",
-      "eggWeight": "13.0~18.0",
+      "eggDiameter": "0.75~1",
+      "eggWeight": "13~18",
       "pet": "寂灭骨龙"
     },
     {
       "id": 84,
-      "eggDiameter": "0.50~0.72",
-      "eggWeight": "5.0~7.5",
+      "eggDiameter": "0.5~0.72",
+      "eggWeight": "5~7.5",
       "pet": "荆棘电环"
     },
     {
       "id": 85,
-      "eggDiameter": "0.50~0.75",
-      "eggWeight": "6.0~10.0",
+      "eggDiameter": "0.5~0.75",
+      "eggWeight": "6~10",
       "pet": "晶石蜗"
     },
     {
       "id": 86,
-      "eggDiameter": "0.55~0.80",
-      "eggWeight": "6.0~9.0",
+      "eggDiameter": "0.55~0.8",
+      "eggWeight": "6~9",
       "pet": "九幽菇"
     },
     {
@@ -524,63 +500,57 @@
       "pet": "菊花梨"
     },
     {
-      "id": 88,
-      "eggDiameter": "0.50~0.70",
-      "eggWeight": "4.5~7.0",
-      "pet": "菊花梨"
-    },
-    {
       "id": 89,
-      "eggDiameter": "0.75~1.00",
-      "eggWeight": "16.0~24.0",
+      "eggDiameter": "0.75~1",
+      "eggWeight": "16~24",
       "pet": "巨灵石"
     },
     {
       "id": 90,
-      "eggDiameter": "0.55~0.80",
-      "eggWeight": "7.0~11.0",
+      "eggDiameter": "0.55~0.8",
+      "eggWeight": "7~11",
       "pet": "巨噬针鼹"
     },
     {
       "id": 91,
-      "eggDiameter": "0.65~0.90",
-      "eggWeight": "9.0~13.0",
+      "eggDiameter": "0.65~0.9",
+      "eggWeight": "9~13",
       "pet": "卷胡巨獭"
     },
     {
       "id": 92,
-      "eggDiameter": "0.40~0.60",
-      "eggWeight": "2.5~5.0",
+      "eggDiameter": "0.4~0.6",
+      "eggWeight": "2.5~5",
       "pet": "卷毛鸭"
     },
     {
       "id": 93,
-      "eggDiameter": "0.65~0.90",
-      "eggWeight": "9.0~13.0",
+      "eggDiameter": "0.65~0.9",
+      "eggWeight": "9~13",
       "pet": "爵士鹿"
     },
     {
       "id": 94,
       "eggDiameter": "0.45~0.65",
-      "eggWeight": "3.5~6.0",
+      "eggWeight": "3.5~6",
       "pet": "咔咔鸟"
     },
     {
       "id": 95,
       "eggDiameter": "0.48~0.68",
-      "eggWeight": "4.0~6.5",
+      "eggWeight": "4~6.5",
       "pet": "卡洛儿"
     },
     {
       "id": 96,
-      "eggDiameter": "0.45~0.70",
-      "eggWeight": "4.0~7.0",
+      "eggDiameter": "0.45~0.7",
+      "eggWeight": "4~7",
       "pet": "卡瓦重"
     },
     {
       "id": 97,
-      "eggDiameter": "0.65~0.90",
-      "eggWeight": "9.0~13.0",
+      "eggDiameter": "0.65~0.9",
+      "eggWeight": "9~13",
       "pet": "瞌睡王"
     },
     {
@@ -597,8 +567,8 @@
     },
     {
       "id": 100,
-      "eggDiameter": "0.60~0.85",
-      "eggWeight": "8.0~12.0",
+      "eggDiameter": "0.6~0.85",
+      "eggWeight": "8~12",
       "pet": "酷拉"
     },
     {
@@ -610,49 +580,37 @@
     {
       "id": 102,
       "eggDiameter": "0.52~0.75",
-      "eggWeight": "5.5~8.0",
+      "eggWeight": "5.5~8",
       "pet": "岚鸟"
     },
     {
       "id": 103,
-      "eggDiameter": "0.41-0.44",
+      "eggDiameter": "0.41-0.8",
       "eggWeight": "14.782-19.8",
       "pet": "里拉鳐"
     },
     {
-      "id": 104,
-      "eggDiameter": "0.55~0.80",
-      "eggWeight": "6.0~9.0",
-      "pet": "里拉鳐"
-    },
-    {
       "id": 105,
-      "eggDiameter": "0.60~0.85",
-      "eggWeight": "12.0~16.0",
+      "eggDiameter": "0.6~0.85",
+      "eggWeight": "12~16",
       "pet": "立方人"
     },
     {
       "id": 106,
-      "eggDiameter": "0.60~0.85",
-      "eggWeight": "9.0~13.0",
+      "eggDiameter": "0.6~0.85",
+      "eggWeight": "9~13",
       "pet": "烈火守护"
     },
     {
       "id": 107,
-      "eggDiameter": "0.29-0.3",
-      "eggWeight": "3.123-3.179",
-      "pet": "灵狐"
-    },
-    {
-      "id": 108,
-      "eggDiameter": "0.52~0.75",
-      "eggWeight": "5.5~8.0",
+      "eggDiameter": "0.29-0.52",
+      "eggWeight": "3.123-5.5",
       "pet": "灵狐"
     },
     {
       "id": 109,
-      "eggDiameter": "0.60~0.85",
-      "eggWeight": "8.0~12.0",
+      "eggDiameter": "0.6~0.85",
+      "eggWeight": "8~12",
       "pet": "龙鱼"
     },
     {
@@ -669,8 +627,8 @@
     },
     {
       "id": 112,
-      "eggDiameter": "0.70~0.95",
-      "eggWeight": "12.0~18.0",
+      "eggDiameter": "0.7~0.95",
+      "eggWeight": "12~18",
       "pet": "罗隐"
     },
     {
@@ -680,15 +638,9 @@
       "pet": "螺旋帕帕"
     },
     {
-      "id": 114,
-      "eggDiameter": "0.55~0.80",
-      "eggWeight": "6.0~9.0",
-      "pet": "螺旋帕帕"
-    },
-    {
       "id": 115,
-      "eggDiameter": "0.55~0.80",
-      "eggWeight": "6.0~9.0",
+      "eggDiameter": "0.55~0.8",
+      "eggWeight": "6~9",
       "pet": "鳗尾兽"
     },
     {
@@ -705,14 +657,14 @@
     },
     {
       "id": 118,
-      "eggDiameter": "0.55~0.80",
-      "eggWeight": "7.0~11.0",
+      "eggDiameter": "0.55~0.8",
+      "eggWeight": "7~11",
       "pet": "梦想三三"
     },
     {
       "id": 119,
       "eggDiameter": "0.45~0.65",
-      "eggWeight": "3.5~6.0",
+      "eggWeight": "3.5~6",
       "pet": "梦悠悠"
     },
     {
@@ -723,38 +675,38 @@
     },
     {
       "id": 121,
-      "eggDiameter": "0.50~0.72",
-      "eggWeight": "5.0~7.5",
+      "eggDiameter": "0.5~0.72",
+      "eggWeight": "5~7.5",
       "pet": "迷迷箱怪"
     },
     {
       "id": 122,
-      "eggDiameter": "0.40~0.60",
-      "eggWeight": "3.0~5.0",
+      "eggDiameter": "0.4~0.6",
+      "eggWeight": "3~5",
       "pet": "喵喵"
     },
     {
       "id": 123,
-      "eggDiameter": "0.50~0.70",
-      "eggWeight": "6.0~9.0",
+      "eggDiameter": "0.5~0.7",
+      "eggWeight": "6~9",
       "pet": "喵呜"
     },
     {
       "id": 124,
-      "eggDiameter": "0.55~0.80",
-      "eggWeight": "6.0~9.0",
+      "eggDiameter": "0.55~0.8",
+      "eggWeight": "6~9",
       "pet": "魔草巫灵"
     },
     {
       "id": 125,
-      "eggDiameter": "0.50~0.72",
-      "eggWeight": "5.0~7.5",
+      "eggDiameter": "0.5~0.72",
+      "eggWeight": "5~7.5",
       "pet": "魔眷鸟"
     },
     {
       "id": 126,
-      "eggDiameter": "0.55~0.80",
-      "eggWeight": "6.0~9.0",
+      "eggDiameter": "0.55~0.8",
+      "eggWeight": "6~9",
       "pet": "泥吼牙"
     },
     {
@@ -772,13 +724,13 @@
     {
       "id": 129,
       "eggDiameter": "0.42~0.62",
-      "eggWeight": "3.0~5.0",
+      "eggWeight": "3~5",
       "pet": "蒲公英娃娃"
     },
     {
       "id": 130,
-      "eggDiameter": "0.50~0.70",
-      "eggWeight": "4.5~7.0",
+      "eggDiameter": "0.5~0.7",
+      "eggWeight": "4.5~7",
       "pet": "奇丽花"
     },
     {
@@ -796,7 +748,7 @@
     {
       "id": 133,
       "eggDiameter": "0.45~0.65",
-      "eggWeight": "3.5~6.0",
+      "eggWeight": "3.5~6",
       "pet": "燃薪虫"
     },
     {
@@ -808,7 +760,7 @@
     {
       "id": 135,
       "eggDiameter": "0.48~0.68",
-      "eggWeight": "4.0~6.5",
+      "eggWeight": "4~6.5",
       "pet": "绅士鸡"
     },
     {
@@ -820,13 +772,13 @@
     {
       "id": 137,
       "eggDiameter": "0.42~0.62",
-      "eggWeight": "3.0~5.0",
+      "eggWeight": "3~5",
       "pet": "圣代甜甜"
     },
     {
       "id": 138,
-      "eggDiameter": "0.70~0.95",
-      "eggWeight": "12.0~18.0",
+      "eggDiameter": "0.7~0.95",
+      "eggWeight": "12~18",
       "pet": "圣剑-X"
     },
     {
@@ -843,14 +795,14 @@
     },
     {
       "id": 141,
-      "eggDiameter": "0.60~0.85",
-      "eggWeight": "8.0~12.0",
+      "eggDiameter": "0.6~0.85",
+      "eggWeight": "8~12",
       "pet": "石冠王蜥"
     },
     {
       "id": 142,
-      "eggDiameter": "0.50~0.72",
-      "eggWeight": "5.0~7.5",
+      "eggDiameter": "0.5~0.72",
+      "eggWeight": "5~7.5",
       "pet": "嗜波螺"
     },
     {
@@ -860,33 +812,27 @@
       "pet": "兽花蕾"
     },
     {
-      "id": 144,
-      "eggDiameter": "0.45~0.65",
-      "eggWeight": "3.5~6.0",
-      "pet": "兽花蕾"
-    },
-    {
       "id": 145,
-      "eggDiameter": "0.12~0.164",
+      "eggDiameter": "0.12~0.17",
       "eggWeight": "0.912~1.544",
       "pet": "书魔虫"
     },
     {
       "id": 146,
       "eggDiameter": "0.55~0.75",
-      "eggWeight": "6.0~9.0",
+      "eggWeight": "6~9",
       "pet": "水灵"
     },
     {
       "id": 147,
       "eggDiameter": "0.45~0.65",
-      "eggWeight": "3.5~6.0",
+      "eggWeight": "3.5~6",
       "pet": "水泡壳"
     },
     {
       "id": 148,
-      "eggDiameter": "0.60~0.85",
-      "eggWeight": "8.0~12.0",
+      "eggDiameter": "0.6~0.85",
+      "eggWeight": "8~12",
       "pet": "朔夜伊芙"
     },
     {
@@ -897,14 +843,14 @@
     },
     {
       "id": 150,
-      "eggDiameter": "0.65~0.90",
-      "eggWeight": "10.0~15.0",
+      "eggDiameter": "0.65~0.9",
+      "eggWeight": "10~15",
       "pet": "乌拉塔"
     },
     {
       "id": 151,
       "eggDiameter": "0.48~0.68",
-      "eggWeight": "4.0~6.5",
+      "eggWeight": "4~6.5",
       "pet": "武者鸡"
     },
     {
@@ -915,20 +861,14 @@
     },
     {
       "id": 153,
-      "eggDiameter": "0.23",
+      "eggDiameter": "0.23~0.23",
       "eggWeight": "2-2.156",
       "pet": "小电企鹅"
     },
     {
       "id": 154,
       "eggDiameter": "0.44-0.59",
-      "eggWeight": "2.857-22.234",
-      "pet": "小独角兽"
-    },
-    {
-      "id": 155,
-      "eggDiameter": "0.60~0.85",
-      "eggWeight": "8.0~12.0",
+      "eggWeight": "15.95-22.234",
       "pet": "小独角兽"
     },
     {
@@ -963,8 +903,8 @@
     },
     {
       "id": 161,
-      "eggDiameter": "0.40~0.60",
-      "eggWeight": "2.5~5.0",
+      "eggDiameter": "0.4~0.6",
+      "eggWeight": "2.5~5",
       "pet": "小皮球"
     },
     {
@@ -1005,14 +945,14 @@
     },
     {
       "id": 168,
-      "eggDiameter": "0.70~0.95",
-      "eggWeight": "12.0~18.0",
+      "eggDiameter": "0.7~0.95",
+      "eggWeight": "12~18",
       "pet": "雪巨人"
     },
     {
       "id": 169,
       "eggDiameter": "0.45~0.65",
-      "eggWeight": "3.5~6.0",
+      "eggWeight": "3.5~6",
       "pet": "雪灵"
     },
     {
@@ -1036,7 +976,7 @@
     {
       "id": 173,
       "eggDiameter": "0.58~0.82",
-      "eggWeight": "7.0~10.0",
+      "eggWeight": "7~10",
       "pet": "雪影娃娃"
     },
     {
@@ -1054,13 +994,13 @@
     {
       "id": 176,
       "eggDiameter": "0.45~0.65",
-      "eggWeight": "3.5~6.0",
+      "eggWeight": "3.5~6",
       "pet": "伊贝粉粉"
     },
     {
       "id": 177,
-      "eggDiameter": "0.70~0.95",
-      "eggWeight": "11.0~16.0",
+      "eggDiameter": "0.7~0.95",
+      "eggWeight": "11~16",
       "pet": "伊兰龙"
     },
     {
@@ -1071,20 +1011,20 @@
     },
     {
       "id": 179,
-      "eggDiameter": "0.70~0.95",
-      "eggWeight": "10.0~15.0",
+      "eggDiameter": "0.7~0.95",
+      "eggWeight": "10~15",
       "pet": "翼龙"
     },
     {
       "id": 180,
       "eggDiameter": "0.58~0.82",
-      "eggWeight": "7.0~10.0",
+      "eggWeight": "7~10",
       "pet": "音速犬"
     },
     {
       "id": 181,
-      "eggDiameter": "0.50~0.72",
-      "eggWeight": "5.0~7.5",
+      "eggDiameter": "0.5~0.72",
+      "eggWeight": "5~7.5",
       "pet": "影狸"
     },
     {
@@ -1096,13 +1036,13 @@
     {
       "id": 183,
       "eggDiameter": "0.45~0.65",
-      "eggWeight": "3.5~6.0",
+      "eggWeight": "3.5~6",
       "pet": "幽冥眼"
     },
     {
       "id": 184,
       "eggDiameter": "0.11~0.85",
-      "eggWeight": "12.01~15",
+      "eggWeight": "1.356~15",
       "pet": "幽影树"
     },
     {
@@ -1127,12 +1067,6 @@
       "id": 188,
       "eggDiameter": "0.26-0.33",
       "eggWeight": "5.057-6.345",
-      "pet": "锥尾羊"
-    },
-    {
-      "id": 189,
-      "eggDiameter": "0.50~0.72",
-      "eggWeight": "5.0~7.5",
       "pet": "锥尾羊"
     },
     {
@@ -1377,8 +1311,8 @@
     },
     {
       "id": 230,
-      "eggDiameter": "0.12-0.21",
-      "eggWeight": "21.405-29.626",
+      "eggDiameter": "0.12-0.42",
+      "eggWeight": "21.405-32.478",
       "pet": "石石"
     },
     {
@@ -1401,14 +1335,14 @@
     },
     {
       "id": 234,
-      "eggDiameter": "0.13-0.14",
-      "eggWeight": "0.477-1.104",
+      "eggDiameter": "0.13-0.28",
+      "eggWeight": "0.447-1.565",
       "pet": "菇菇丁"
     },
     {
       "id": 235,
-      "eggDiameter": "0.13-0.15",
-      "eggWeight": "1.419-1.688",
+      "eggDiameter": "0.13-0.16",
+      "eggWeight": "1.419-1.894",
       "pet": "号儿鱼"
     },
     {
@@ -1443,8 +1377,8 @@
     },
     {
       "id": 241,
-      "eggDiameter": "0.15-0.168",
-      "eggWeight": "1.895-2.26",
+      "eggDiameter": "0.14-0.17",
+      "eggWeight": "1.72-2.26",
       "pet": "波波螺"
     },
     {
@@ -1456,7 +1390,7 @@
     {
       "id": 243,
       "eggDiameter": "0.156-0.224",
-      "eggWeight": "1.44-2.08",
+      "eggWeight": "1.37-2.08",
       "pet": "恶魔叮"
     },
     {
@@ -1474,13 +1408,13 @@
     {
       "id": 246,
       "eggDiameter": "0.17-0.212",
-      "eggWeight": "2.506-3",
+      "eggWeight": "2.496-3",
       "pet": "小鼠獭"
     },
     {
       "id": 247,
-      "eggDiameter": "0.17-0.19",
-      "eggWeight": "4.697-5.134",
+      "eggDiameter": "0.17-0.24",
+      "eggWeight": "4.697-6.601",
       "pet": "风铃鲨"
     },
     {
@@ -1545,8 +1479,8 @@
     },
     {
       "id": 258,
-      "eggDiameter": "0.19-0.208",
-      "eggWeight": "1.851-2.12",
+      "eggDiameter": "0.18-0.208",
+      "eggWeight": "1.71-2.12",
       "pet": "一窝蜂"
     },
     {
@@ -1557,8 +1491,8 @@
     },
     {
       "id": 260,
-      "eggDiameter": "0.192-0.24",
-      "eggWeight": "1.4-1.636",
+      "eggDiameter": "0.192-0.25",
+      "eggWeight": "1.4-1.703",
       "pet": "圆眼蜘蛛"
     },
     {
@@ -1611,7 +1545,7 @@
     },
     {
       "id": 269,
-      "eggDiameter": "0.22-0.284",
+      "eggDiameter": "0.22-0.29",
       "eggWeight": "3.81-5",
       "pet": "吸泥鸥"
     },
@@ -1635,8 +1569,8 @@
     },
     {
       "id": 273,
-      "eggDiameter": "0.24-0.27",
-      "eggWeight": "4.221-4.713",
+      "eggDiameter": "0.24-0.3",
+      "eggWeight": "4.221-5.216",
       "pet": "治愈兔"
     },
     {

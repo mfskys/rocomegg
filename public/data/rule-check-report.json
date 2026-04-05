@@ -1,0 +1,437 @@
+{
+  "summary": {
+    "totalPets": 204,
+    "issuePets": 34,
+    "rangeCountNot1": 19,
+    "exactOutsideRange": 15
+  },
+  "issues": [
+    {
+      "pet": "阿米樱",
+      "type": "range_count_not_1",
+      "rangeCount": 0,
+      "rangeIds": [],
+      "exactCount": 1
+    },
+    {
+      "pet": "白金独角兽",
+      "type": "range_count_not_1",
+      "rangeCount": 0,
+      "rangeIds": [],
+      "exactCount": 1
+    },
+    {
+      "pet": "波波螺",
+      "type": "exact_outside_range",
+      "rangeId": 241,
+      "rangeDiameter": "0.15-0.168",
+      "rangeWeight": "1.895-2.26",
+      "outExacts": [
+        {
+          "id": 13,
+          "eggDiameter": "0.14",
+          "eggWeight": "1.72",
+          "inDiameter": false,
+          "inWeight": false
+        },
+        {
+          "id": 223,
+          "eggDiameter": "0.17",
+          "eggWeight": "2.215",
+          "inDiameter": false,
+          "inWeight": true
+        }
+      ]
+    },
+    {
+      "pet": "锤头鹳",
+      "type": "range_count_not_1",
+      "rangeCount": 2,
+      "rangeIds": [
+        21,
+        22
+      ],
+      "exactCount": 1
+    },
+    {
+      "pet": "恶魔叮",
+      "type": "exact_outside_range",
+      "rangeId": 243,
+      "rangeDiameter": "0.156-0.224",
+      "rangeWeight": "1.44-2.08",
+      "outExacts": [
+        {
+          "id": 44,
+          "eggDiameter": "0.19",
+          "eggWeight": "1.37",
+          "inDiameter": true,
+          "inWeight": false
+        }
+      ]
+    },
+    {
+      "pet": "恶魔狼",
+      "type": "range_count_not_1",
+      "rangeCount": 2,
+      "rangeIds": [
+        45,
+        46
+      ],
+      "exactCount": 2
+    },
+    {
+      "pet": "翡翠水母",
+      "type": "exact_outside_range",
+      "rangeId": 48,
+      "rangeDiameter": "0.196-0.28",
+      "rangeWeight": "12.61-14.72",
+      "outExacts": [
+        {
+          "id": 47,
+          "eggDiameter": "0.21",
+          "eggWeight": "11.2",
+          "inDiameter": true,
+          "inWeight": false
+        }
+      ]
+    },
+    {
+      "pet": "粉粉星",
+      "type": "range_count_not_1",
+      "rangeCount": 0,
+      "rangeIds": [],
+      "exactCount": 1
+    },
+    {
+      "pet": "公平鸽",
+      "type": "exact_outside_range",
+      "rangeId": 54,
+      "rangeDiameter": "0.18~0.68",
+      "rangeWeight": "1~1.576",
+      "outExacts": [
+        {
+          "id": 53,
+          "eggDiameter": "0.19",
+          "eggWeight": "0.894",
+          "inDiameter": true,
+          "inWeight": false
+        }
+      ]
+    },
+    {
+      "pet": "菇菇丁",
+      "type": "exact_outside_range",
+      "rangeId": 234,
+      "rangeDiameter": "0.13-0.14",
+      "rangeWeight": "0.477-1.104",
+      "outExacts": [
+        {
+          "id": 55,
+          "eggDiameter": "0.13",
+          "eggWeight": "0.447",
+          "inDiameter": true,
+          "inWeight": false
+        },
+        {
+          "id": 221,
+          "eggDiameter": "0.28",
+          "eggWeight": "1.565",
+          "inDiameter": false,
+          "inWeight": false
+        }
+      ]
+    },
+    {
+      "pet": "海枝枝",
+      "type": "range_count_not_1",
+      "rangeCount": 2,
+      "rangeIds": [
+        63,
+        64
+      ],
+      "exactCount": 0
+    },
+    {
+      "pet": "号儿鱼",
+      "type": "exact_outside_range",
+      "rangeId": 235,
+      "rangeDiameter": "0.13-0.15",
+      "rangeWeight": "1.419-1.688",
+      "outExacts": [
+        {
+          "id": 216,
+          "eggDiameter": "0.16",
+          "eggWeight": "1.894",
+          "inDiameter": false,
+          "inWeight": false
+        }
+      ]
+    },
+    {
+      "pet": "记忆石",
+      "type": "range_count_not_1",
+      "rangeCount": 2,
+      "rangeIds": [
+        81,
+        82
+      ],
+      "exactCount": 1
+    },
+    {
+      "pet": "菊花梨",
+      "type": "range_count_not_1",
+      "rangeCount": 2,
+      "rangeIds": [
+        87,
+        88
+      ],
+      "exactCount": 0
+    },
+    {
+      "pet": "里拉鳐",
+      "type": "range_count_not_1",
+      "rangeCount": 2,
+      "rangeIds": [
+        103,
+        104
+      ],
+      "exactCount": 0
+    },
+    {
+      "pet": "灵狐",
+      "type": "range_count_not_1",
+      "rangeCount": 2,
+      "rangeIds": [
+        107,
+        108
+      ],
+      "exactCount": 0
+    },
+    {
+      "pet": "螺旋帕帕",
+      "type": "range_count_not_1",
+      "rangeCount": 2,
+      "rangeIds": [
+        113,
+        114
+      ],
+      "exactCount": 0
+    },
+    {
+      "pet": "梦游",
+      "type": "range_count_not_1",
+      "rangeCount": 0,
+      "rangeIds": [],
+      "exactCount": 1
+    },
+    {
+      "pet": "棋棋",
+      "type": "range_count_not_1",
+      "rangeCount": 0,
+      "rangeIds": [],
+      "exactCount": 1
+    },
+    {
+      "pet": "权杖-Ⅱ",
+      "type": "range_count_not_1",
+      "rangeCount": 0,
+      "rangeIds": [],
+      "exactCount": 1
+    },
+    {
+      "pet": "兽花蕾",
+      "type": "range_count_not_1",
+      "rangeCount": 2,
+      "rangeIds": [
+        143,
+        144
+      ],
+      "exactCount": 0
+    },
+    {
+      "pet": "书魔虫",
+      "type": "exact_outside_range",
+      "rangeId": 145,
+      "rangeDiameter": "0.12~0.164",
+      "rangeWeight": "0.912~1.544",
+      "outExacts": [
+        {
+          "id": 219,
+          "eggDiameter": "0.17",
+          "eggWeight": "1.452",
+          "inDiameter": false,
+          "inWeight": true
+        }
+      ]
+    },
+    {
+      "pet": "吸泥鸥",
+      "type": "exact_outside_range",
+      "rangeId": 269,
+      "rangeDiameter": "0.22-0.284",
+      "rangeWeight": "3.81-5",
+      "outExacts": [
+        {
+          "id": 152,
+          "eggDiameter": "0.29",
+          "eggWeight": "4.89",
+          "inDiameter": false,
+          "inWeight": true
+        }
+      ]
+    },
+    {
+      "pet": "小独角兽",
+      "type": "range_count_not_1",
+      "rangeCount": 2,
+      "rangeIds": [
+        154,
+        155
+      ],
+      "exactCount": 0
+    },
+    {
+      "pet": "小甲虫",
+      "type": "range_count_not_1",
+      "rangeCount": 0,
+      "rangeIds": [],
+      "exactCount": 2
+    },
+    {
+      "pet": "小鼠獭",
+      "type": "exact_outside_range",
+      "rangeId": 246,
+      "rangeDiameter": "0.17-0.212",
+      "rangeWeight": "2.506-3",
+      "outExacts": [
+        {
+          "id": 194,
+          "eggDiameter": "0.17",
+          "eggWeight": "2.496",
+          "inDiameter": true,
+          "inWeight": false
+        }
+      ]
+    },
+    {
+      "pet": "雪蛮人",
+      "type": "range_count_not_1",
+      "rangeCount": 0,
+      "rangeIds": [],
+      "exactCount": 1
+    },
+    {
+      "pet": "一窝蜂",
+      "type": "exact_outside_range",
+      "rangeId": 258,
+      "rangeDiameter": "0.19-0.208",
+      "rangeWeight": "1.851-2.12",
+      "outExacts": [
+        {
+          "id": 175,
+          "eggDiameter": "0.18",
+          "eggWeight": "1.71",
+          "inDiameter": false,
+          "inWeight": false
+        }
+      ]
+    },
+    {
+      "pet": "幽影树",
+      "type": "exact_outside_range",
+      "rangeId": 184,
+      "rangeDiameter": "0.11~0.85",
+      "rangeWeight": "12.01~15",
+      "outExacts": [
+        {
+          "id": 208,
+          "eggDiameter": "0.11",
+          "eggWeight": "1.356",
+          "inDiameter": true,
+          "inWeight": false
+        }
+      ]
+    },
+    {
+      "pet": "圆眼蜘蛛",
+      "type": "exact_outside_range",
+      "rangeId": 260,
+      "rangeDiameter": "0.192-0.24",
+      "rangeWeight": "1.4-1.636",
+      "outExacts": [
+        {
+          "id": 185,
+          "eggDiameter": "0.25",
+          "eggWeight": "1.703",
+          "inDiameter": false,
+          "inWeight": false
+        }
+      ]
+    },
+    {
+      "pet": "治愈兔",
+      "type": "exact_outside_range",
+      "rangeId": 273,
+      "rangeDiameter": "0.24-0.27",
+      "rangeWeight": "4.221-4.713",
+      "outExacts": [
+        {
+          "id": 207,
+          "eggDiameter": "0.3",
+          "eggWeight": "5.216",
+          "inDiameter": false,
+          "inWeight": false
+        }
+      ]
+    },
+    {
+      "pet": "锥尾羊",
+      "type": "range_count_not_1",
+      "rangeCount": 2,
+      "rangeIds": [
+        188,
+        189
+      ],
+      "exactCount": 1
+    },
+    {
+      "pet": "风铃鲨",
+      "type": "exact_outside_range",
+      "rangeId": 247,
+      "rangeDiameter": "0.17-0.19",
+      "rangeWeight": "4.697-5.134",
+      "outExacts": [
+        {
+          "id": 195,
+          "eggDiameter": "0.23",
+          "eggWeight": "6.222",
+          "inDiameter": false,
+          "inWeight": false
+        },
+        {
+          "id": 211,
+          "eggDiameter": "0.24",
+          "eggWeight": "6.601",
+          "inDiameter": false,
+          "inWeight": false
+        }
+      ]
+    },
+    {
+      "pet": "石石",
+      "type": "exact_outside_range",
+      "rangeId": 230,
+      "rangeDiameter": "0.12-0.21",
+      "rangeWeight": "21.405-29.626",
+      "outExacts": [
+        {
+          "id": 203,
+          "eggDiameter": "0.42",
+          "eggWeight": "32.478",
+          "inDiameter": false,
+          "inWeight": false
+        }
+      ]
+    }
+  ]
+}
