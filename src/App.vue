@@ -11,11 +11,9 @@ const diameterInput = ref('')
 const weightInput = ref('')
 
 const rawItems = ref([])
+const exactResults = ref([])
 const candidates = ref([])
-const searchMode = ref('matched') // matched | nearest
-const petIdMap = ref(new Map())
-
-
+const searchMode = ref('matched') // exact | matched | nearest
 
 function toNumber(value) {
   const n = Number(value)
@@ -66,6 +64,14 @@ function distanceToRange(value, range) {
   return 0
 }
 
+function isPointRange(range) {
+  return Math.abs(range.max - range.min) < 1e-12
+}
+
+function nearlyEqual(a, b, eps = 1e-9) {
+  return Math.abs(a - b) <= eps
+}
+
 function clamp(v, min, max) {
   return Math.min(max, Math.max(min, v))
 }
@@ -74,81 +80,100 @@ function gaussian(z) {
   return Math.exp(-0.5 * z * z)
 }
 
+function probabilityColor(p) {
+  if (p >= 60) return '#67c23a'
+  if (p >= 30) return '#e6a23c'
+  return '#909399'
+}
+
 /**
- * 概率评分模型（更符合逻辑）
- * 1) 在范围内：离区间中心越近，分越高（高斯分布）
- * 2) 超出范围：按超出距离指数衰减（惩罚）
- * 3) 综合直径与重量：直径权重略高（0.58 / 0.42）
- * 4) 范围越窄，辨识度越高，给予轻微加权
+ * 分类评分逻辑：
+ * 1) 完全命中（exact）：
+ *    - 仅当记录本身是“单点直径 + 单点重量”
+ *    - 且输入值与两者完全相等
+ * 2) 范围命中（matched）：
+ *    - 直径与重量均落入区间
+ * 3) 近似候选（nearest）：
+ *    - 至少一维超出区间，按距离衰减评分
  */
-function rowLikelihood(diameter, weight, row) {
-  const dRange = row.diameterRange
-  const wRange = row.weightRange
+function evaluateRow(diameter, weight, row) {
+  const dIn = inRange(diameter, row.diameterRange)
+  const wIn = inRange(weight, row.weightRange)
+  const dPoint = isPointRange(row.diameterRange)
+  const wPoint = isPointRange(row.weightRange)
 
-  const dSpan = span(dRange)
-  const wSpan = span(wRange)
+  const exact =
+    dPoint &&
+    wPoint &&
+    nearlyEqual(diameter, row.diameterRange.min) &&
+    nearlyEqual(weight, row.weightRange.min)
 
-  const dHalf = dSpan / 2
-  const wHalf = wSpan / 2
-
-  const dCenter = centerOfRange(dRange)
-  const wCenter = centerOfRange(wRange)
-
-  const dInside = inRange(diameter, dRange)
-  const wInside = inRange(weight, wRange)
-
-  const dBaseTol = 0.02
-  const wBaseTol = 0.4
-
-  let dScore = 0
-  if (dInside) {
-    const z = Math.abs(diameter - dCenter) / (dHalf + dBaseTol)
-    dScore = gaussian(z)
-  } else {
-    const out = distanceToRange(diameter, dRange)
-    const z = out / (dHalf + dBaseTol * 2.2)
-    dScore = gaussian(z) * 0.32
+  if (exact) {
+    return {
+      matchType: 'exact',
+      score: 1000 // 完全命中优先级绝对最高
+    }
   }
 
-  let wScore = 0
-  if (wInside) {
-    const z = Math.abs(weight - wCenter) / (wHalf + wBaseTol)
-    wScore = gaussian(z)
-  } else {
-    const out = distanceToRange(weight, wRange)
-    const z = out / (wHalf + wBaseTol * 2.2)
-    wScore = gaussian(z) * 0.32
+  // 范围内评分：离中心越近越高
+  if (dIn && wIn) {
+    const dHalf = span(row.diameterRange) / 2
+    const wHalf = span(row.weightRange) / 2
+
+    const dBaseTol = 0.02
+    const wBaseTol = 0.4
+
+    const dZ = Math.abs(diameter - row.diameterCenter) / (dHalf + dBaseTol)
+    const wZ = Math.abs(weight - row.weightCenter) / (wHalf + wBaseTol)
+
+    const dScore = gaussian(dZ)
+    const wScore = gaussian(wZ)
+
+    // 直径权重略高
+    let score = Math.pow(dScore, 0.58) * Math.pow(wScore, 0.42)
+
+    // 区间越窄，辨识度越高，给轻量加成（有上限）
+    const dSpan = span(row.diameterRange)
+    const wSpan = span(row.weightRange)
+    const precisionBoost = 1 + 0.16 * (1 / (1 + dSpan * 12)) + 0.12 * (1 / (1 + wSpan * 2))
+
+    score *= clamp(precisionBoost, 1, 1.28)
+
+    return {
+      matchType: 'matched',
+      score
+    }
   }
 
-  // 几何组合，避免单一维度过高直接碾压
-  let score = Math.pow(dScore, 0.58) * Math.pow(wScore, 0.42)
+  // 近似评分：按超出区间距离衰减
+  const dOut = distanceToRange(diameter, row.diameterRange)
+  const wOut = distanceToRange(weight, row.weightRange)
 
-  // 范围越窄，代表约束更强，轻微提高可信度
-  const precisionBoost =
-    1 +
-    0.18 * (1 / (1 + dSpan * 12)) +
-    0.14 * (1 / (1 + wSpan * 2))
-
-  score *= clamp(precisionBoost, 1, 1.32)
+  const dPenalty = dOut / 0.05
+  const wPenalty = wOut / 1.0
+  const score = 1 / (1 + dPenalty + wPenalty)
 
   return {
-    score,
-    strictHit: dInside && wInside
+    matchType: 'nearest',
+    score
   }
 }
 
 function normalizeProbabilities(items) {
   const sum = items.reduce((acc, item) => acc + item._score, 0)
-  if (sum <= 0) {
-    return items.map((item) => ({ ...item, probability: 0 }))
-  }
+  if (sum <= 0) return items.map((item) => ({ ...item, probability: 0, color: probabilityColor(0) }))
 
-  return items.map((item) => ({
-    ...item,
-    probability: Number(((item._score / sum) * 100).toFixed(2))
-  }))
+  return items.map((item) => {
+    const probability = Number(((item._score / sum) * 100).toFixed(2))
+    return {
+      ...item,
+      probability,
+      color: probabilityColor(probability)
+    }
+  })
 }
 
+// 按精灵聚合（用于范围命中和近似候选）
 function aggregateByPet(rows) {
   const group = new Map()
 
@@ -161,7 +186,7 @@ function aggregateByPet(rows) {
   for (const [pet, list] of group.entries()) {
     const sorted = [...list].sort((a, b) => b._score - a._score)
 
-    // 多条记录时按衰减叠加：主记录>次记录>再次记录...
+    // 多条记录衰减叠加（支持同精灵多个单独记录）
     let petScore = 0
     for (let i = 0; i < sorted.length; i++) {
       petScore += sorted[i]._score * Math.pow(0.58, i)
@@ -198,10 +223,7 @@ async function loadDataset() {
 
     const idMap = new Map()
     const masterCreatures = Array.isArray(masterJson?.creatures) ? masterJson.creatures : []
-    for (const c of masterCreatures) {
-      idMap.set(c.name, c.id)
-    }
-    petIdMap.value = idMap
+    for (const c of masterCreatures) idMap.set(c.name, c.id)
 
     const rows = Array.isArray(eggJson?.items) ? eggJson.items : []
     rawItems.value = rows
@@ -217,7 +239,9 @@ async function loadDataset() {
           eggDiameter: row.eggDiameter,
           eggWeight: row.eggWeight,
           diameterRange,
-          weightRange
+          weightRange,
+          diameterCenter: centerOfRange(diameterRange),
+          weightCenter: centerOfRange(weightRange)
         }
       })
       .filter(Boolean)
@@ -234,6 +258,7 @@ function onReset() {
   diameterInput.value = ''
   weightInput.value = ''
   hasSearched.value = false
+  exactResults.value = []
   candidates.value = []
   searchMode.value = 'matched'
 }
@@ -257,24 +282,65 @@ async function onSearch() {
 
   searching.value = true
   hasSearched.value = true
-  await new Promise((resolve) => setTimeout(resolve, 260))
+  await new Promise((resolve) => setTimeout(resolve, 220))
 
-  const scored = rawItems.value.map((row) => {
-    const { score, strictHit } = rowLikelihood(d, w, row)
-    return { ...row, _score: score, strictHit }
+  const scoredRows = rawItems.value.map((row) => {
+    const { matchType, score } = evaluateRow(d, w, row)
+    return { ...row, matchType, _score: score }
   })
 
-  const strictRows = scored.filter((x) => x.strictHit).sort((a, b) => b._score - a._score)
-  const pool =
-    strictRows.length > 0
-      ? strictRows
-      : scored.sort((a, b) => b._score - a._score).slice(0, 22)
+  // 1) 完全命中（精确记录）优先显示，且可多条
+  const exactRows = scoredRows
+    .filter((r) => r.matchType === 'exact')
+    .sort((a, b) => Number(a.petId) - Number(b.petId) || a.pet.localeCompare(b.pet, 'zh-CN'))
 
-  const merged = aggregateByPet(pool)
-  const top = merged.slice(0, strictRows.length > 0 ? 12 : 10)
+  if (exactRows.length > 0) {
+    searchMode.value = 'exact'
+    exactResults.value = normalizeProbabilities(
+      exactRows.map((r) => ({
+        pet: r.pet,
+        petId: r.petId,
+        eggDiameter: r.eggDiameter,
+        eggWeight: r.eggWeight,
+        _score: r._score
+      }))
+    )
 
-  candidates.value = normalizeProbabilities(top)
-  searchMode.value = strictRows.length > 0 ? 'matched' : 'nearest'
+    // 仍提供其他候选：先范围命中，再近似
+    const rangeRows = scoredRows.filter((r) => r.matchType === 'matched')
+    if (rangeRows.length > 0) {
+      const merged = aggregateByPet(rangeRows).slice(0, 10)
+      candidates.value = normalizeProbabilities(merged)
+    } else {
+      const nearestRows = scoredRows
+        .filter((r) => r.matchType === 'nearest')
+        .sort((a, b) => b._score - a._score)
+        .slice(0, 24)
+      const merged = aggregateByPet(nearestRows).slice(0, 8)
+      candidates.value = normalizeProbabilities(merged)
+    }
+
+    searching.value = false
+    return
+  }
+
+  exactResults.value = []
+
+  // 2) 范围命中
+  const matchedRows = scoredRows.filter((r) => r.matchType === 'matched')
+  if (matchedRows.length > 0) {
+    searchMode.value = 'matched'
+    const merged = aggregateByPet(matchedRows).slice(0, 12)
+    candidates.value = normalizeProbabilities(merged)
+    searching.value = false
+    return
+  }
+
+  // 3) 近似候选
+  searchMode.value = 'nearest'
+  const nearestRows = scoredRows.sort((a, b) => b._score - a._score).slice(0, 24)
+  const merged = aggregateByPet(nearestRows).slice(0, 8)
+  candidates.value = normalizeProbabilities(merged)
   searching.value = false
 }
 
@@ -286,7 +352,6 @@ onMounted(loadDataset)
     <header class="hero">
       <h1>洛克王国世界精灵蛋查询站</h1>
       <p>输入蛋直径（m）和蛋重量（kg），查询可能孵化的候选精灵</p>
-
     </header>
 
     <main class="panel">
@@ -298,7 +363,7 @@ onMounted(loadDataset)
               <el-input
                 v-model="diameterInput"
                 type="number"
-                step="0.01"
+                step="0.001"
                 placeholder="例如：0.58"
                 clearable
                 size="large"
@@ -309,7 +374,7 @@ onMounted(loadDataset)
               <el-input
                 v-model="weightInput"
                 type="number"
-                step="0.01"
+                step="0.001"
                 placeholder="例如：8.6"
                 clearable
                 size="large"
@@ -336,8 +401,11 @@ onMounted(loadDataset)
       <section class="result-card">
         <div class="result-header">
           <h2>候选精灵</h2>
-          <el-tag v-if="hasSearched && searchMode === 'matched'" type="success" effect="light" round>
-            精确命中
+          <el-tag v-if="hasSearched && searchMode === 'exact'" type="danger" effect="light" round>
+            完全命中优先
+          </el-tag>
+          <el-tag v-else-if="hasSearched && searchMode === 'matched'" type="success" effect="light" round>
+            范围命中
           </el-tag>
           <el-tag v-else-if="hasSearched && searchMode === 'nearest'" type="warning" effect="light" round>
             近似候选
@@ -347,34 +415,50 @@ onMounted(loadDataset)
         <el-skeleton :loading="loadingData || searching" animated :rows="5">
           <template #default>
             <div v-if="!hasSearched" class="empty">请输入蛋直径和蛋重量后点击查询</div>
-            <div v-else-if="!candidates.length" class="empty">未查询到候选精灵</div>
+            <div v-else-if="!exactResults.length && !candidates.length" class="empty">未查询到候选精灵</div>
 
-            <transition-group v-else name="rank" tag="div" class="result-list">
-              <article
-                v-for="(item, index) in candidates"
-                :key="`${item.petId}-${item.pet}`"
-                class="result-item"
-              >
-                <div class="left">
-                  <div class="title-row">
-                    <h3>{{ index + 1 }}. {{ item.pet }}</h3>
-                    <span class="pet-id">#{{ item.petId }}</span>
+            <!-- 完全命中（精确记录）单独展示，可多条 -->
+            <div v-if="exactResults.length" class="exact-block">
+              <div class="sub-head">完全命中（精确记录）</div>
+              <transition-group name="rank" tag="div" class="result-list">
+                <article v-for="(item, index) in exactResults" :key="`exact-${item.petId}-${index}`" class="result-item exact-item">
+                  <div class="left">
+                    <div class="title-row">
+                      <h3>{{ index + 1 }}. {{ item.pet }}</h3>
+                      <span class="pet-id">#{{ item.petId }}</span>
+                    </div>
+                    <p>精确直径：{{ item.eggDiameter }} m</p>
+                    <p>精确重量：{{ item.eggWeight }} kg</p>
                   </div>
-                  <p>蛋直径范围：{{ item.eggDiameter }} m</p>
-                  <p>蛋重量范围：{{ item.eggWeight }} kg</p>
-                  <p v-if="item.matchCount > 1" class="meta">命中记录：{{ item.matchCount }} 条</p>
-                </div>
-                <div class="right">
-                  <div class="prob">{{ item.probability }}%</div>
-                  <el-progress
-                    :percentage="item.probability"
-                    :stroke-width="10"
-                    :show-text="false"
-                    :color="item.probability >= 60 ? '#67c23a' : item.probability >= 30 ? '#e6a23c' : '#909399'"
-                  />
-                </div>
-              </article>
-            </transition-group>
+                  <div class="right">
+                    <div class="prob">{{ item.probability }}%</div>
+                    <el-progress :percentage="item.probability" :stroke-width="10" :show-text="false" :color="item.color" />
+                  </div>
+                </article>
+              </transition-group>
+            </div>
+
+            <!-- 其他候选 -->
+            <div v-if="candidates.length" class="other-block">
+              <div class="sub-head">{{ exactResults.length ? '其他候选' : '结果列表' }}</div>
+              <transition-group name="rank" tag="div" class="result-list">
+                <article v-for="(item, index) in candidates" :key="`${item.petId}-${item.pet}`" class="result-item">
+                  <div class="left">
+                    <div class="title-row">
+                      <h3>{{ index + 1 }}. {{ item.pet }}</h3>
+                      <span class="pet-id">#{{ item.petId }}</span>
+                    </div>
+                    <p>蛋直径范围：{{ item.eggDiameter }} m</p>
+                    <p>蛋重量范围：{{ item.eggWeight }} kg</p>
+                    <p v-if="item.matchCount > 1" class="meta">命中记录：{{ item.matchCount }} 条</p>
+                  </div>
+                  <div class="right">
+                    <div class="prob">{{ item.probability }}%</div>
+                    <el-progress :percentage="item.probability" :stroke-width="10" :show-text="false" :color="item.color" />
+                  </div>
+                </article>
+              </transition-group>
+            </div>
           </template>
         </el-skeleton>
       </section>
@@ -404,7 +488,6 @@ onMounted(loadDataset)
   color: #474553;
 }
 
-
 .panel {
   max-width: 980px;
   margin: 0 auto;
@@ -433,6 +516,7 @@ onMounted(loadDataset)
   grid-template-columns: 1fr;
   gap: 12px;
 }
+
 .actions {
   display: flex;
   gap: 12px;
@@ -468,6 +552,15 @@ onMounted(loadDataset)
   padding: 28px 10px;
 }
 
+.sub-head {
+  font-weight: 700;
+  color: #4e48a6;
+  margin: 8px 2px 10px;
+}
+.other-block {
+  margin-top: 12px;
+}
+
 .result-list {
   display: grid;
   gap: 12px;
@@ -481,6 +574,11 @@ onMounted(loadDataset)
   grid-template-columns: 1fr;
   gap: 12px;
 }
+.exact-item {
+  border: 1px solid rgba(245, 108, 108, 0.35);
+  background: linear-gradient(180deg, #fff, #fff9f9);
+}
+
 .title-row {
   display: flex;
   align-items: center;
@@ -520,7 +618,7 @@ onMounted(loadDataset)
   color: #5140b3;
 }
 
-/* 排名变化动画 */
+/* 排序动画 */
 .rank-enter-active,
 .rank-leave-active {
   transition: all 0.35s ease;
