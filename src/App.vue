@@ -661,7 +661,7 @@ onMounted(loadDataset)
   margin: 18px auto 0;
   padding: 12px 6px 0;
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   gap: 14px;
   color: #6f6a86;
   font-size: 13px;
