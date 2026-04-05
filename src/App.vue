@@ -14,6 +14,7 @@ const rawItems = ref([])
 const exactResults = ref([])
 const candidates = ref([])
 const searchMode = ref('matched') // exact | matched | nearest
+const surveyUrl = 'https://f.wps.cn/ksform/w/write/YUmapbHA/#routePromt'
 
 function toNumber(value) {
   const n = Number(value)
@@ -263,6 +264,10 @@ function onReset() {
   searchMode.value = 'matched'
 }
 
+function onOpenSurvey() {
+  window.open(surveyUrl, '_blank', 'noopener,noreferrer')
+}
+
 async function onSearch() {
   const d = toNumber(diameterInput.value)
   const w = toNumber(weightInput.value)
@@ -383,6 +388,7 @@ onMounted(loadDataset)
           </div>
 
           <div class="actions">
+            <el-button class="submit-btn" size="large" @click="onOpenSurvey">投稿数据</el-button>
             <el-button class="reset-btn" size="large" :icon="Refresh" @click="onReset">重置</el-button>
             <el-button
               class="query-btn"
@@ -530,23 +536,40 @@ onMounted(loadDataset)
 
 .actions {
   display: flex;
-  gap: 12px;
-  flex-wrap: nowrap;
-  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
   width: 100%;
 }
+
+.actions :deep(.el-button) {
+  flex: 1 1 calc(50% - 5px);
+  min-width: 120px;
+}
+
 .query-btn {
+  width: 100%;
   border-radius: 999px !important;
   border: none !important;
   padding: 12px 28px !important;
   background: linear-gradient(135deg, #5140b3, #6a5acd) !important;
   box-shadow: 0 10px 20px rgba(81, 64, 179, 0.22);
 }
+
 .reset-btn {
+  width: 100%;
   border-radius: 999px !important;
   border: none !important;
   padding: 12px 26px !important;
   background: #f4f3fb !important;
+  color: #5140b3 !important;
+}
+
+.submit-btn {
+  width: 100%;
+  border-radius: 999px !important;
+  border: 1px solid #d8d3f2 !important;
+  padding: 12px 26px !important;
+  background: #ffffff !important;
   color: #5140b3 !important;
 }
 
@@ -681,6 +704,19 @@ onMounted(loadDataset)
   .grid {
     grid-template-columns: 1fr 1fr;
   }
+
+  .actions {
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    gap: 12px;
+  }
+
+  .actions :deep(.el-button) {
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 132px;
+  }
+
   .result-item {
     grid-template-columns: 1.2fr 0.8fr;
     align-items: center;
