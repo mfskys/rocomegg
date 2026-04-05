@@ -1,74 +1,26 @@
 # 洛克王国世界精灵蛋查询站
 
-一个基于 **Vue 3 + Vite + Element Plus** 的前端静态网站。  
-核心功能：输入精灵蛋的 **直径（m）** 与 **重量（kg）**，返回可能孵化的候选精灵与概率。
+一个基于前端静态部署的查询站。  
+输入精灵蛋的 **直径（m）** 与 **重量（kg）**，即可返回可能孵化的候选精灵与概率。
 
 - 在线地址（GitHub Pages）：`https://mfskys.github.io/rocomegg/`
 
 ---
 
-## 1. 技术栈
+## 使用说明
 
-- **Vue 3**：页面框架
-- **Vite**：开发与构建工具
-- **Element Plus**：UI 组件库
-- **JSON（public/data）**：静态数据存储
-- **GitHub Pages + GitHub Actions**：自动部署
+1. 在页面输入精灵蛋尺寸与重量  
+2. 点击查询按钮  
+3. 查看完全命中、范围命中与近似候选结果
 
 ---
 
-## 2. 目录结构
+## Star History
 
-```text
-rock-egg-table/
-├─ .github/
-│  ├─ dependabot.yml
-│  └─ workflows/
-│     └─ deploy-pages.yml          # GitHub Actions 自动部署工作流
-├─ public/
-│  ├─ rocom.ico
-│  └─ data/
-│     ├─ creatures-master-list.json
-│     └─ egg-measurements-final.json
-├─ src/
-│  ├─ App.vue
-│  ├─ main.js
-│  └─ style.css
-├─ index.html
-├─ vite.config.js
-├─ LICENSE
-└─ package.json
-```
+下图展示本项目的 GitHub Star 历史趋势：
 
----
-
-## 3. 本地开发
-
-> 建议 Node.js 版本：18+
-
-### 安装依赖
-
-```bash
-npm install
-```
-
-### 启动开发环境
-
-```bash
-npm run dev
-```
-
-默认地址：`http://localhost:5173/`
-
-### 本地构建与预览
-
-```bash
-npm run build
-npm run preview
-```
-
----
-
-## 4. License
-
-本项目使用 **MIT License**。
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=mfskys/rocomegg&type=date&theme=dark&legend=top-left" />
+  <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=mfskys/rocomegg&type=date&legend=top-left" />
+  <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=mfskys/rocomegg&type=date&legend=top-left" />
+</picture>
