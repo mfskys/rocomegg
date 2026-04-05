@@ -2,8 +2,9 @@
 
 一个基于前端静态部署的查询站。  
 输入精灵蛋的 **直径（m）** 与 **重量（kg）**，即可返回可能孵化的候选精灵与概率。
+包括精准数据和范围数据，精准数据是有用户在游戏中真实孵化的数据。
 
-- 在线地址（GitHub Pages）：`https://mfskys.github.io/rocomegg/`
+- 查询地址：`https://rocom.mfsky.qzz.io/`
 
 ---
 
@@ -16,9 +17,6 @@
 ---
 
 ## Star History
-
-下图展示本项目的 GitHub Star 历史趋势：
-
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=mfskys/rocomegg&type=date&theme=dark&legend=top-left" />
   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=mfskys/rocomegg&type=date&legend=top-left" />
