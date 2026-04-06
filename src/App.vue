@@ -38,10 +38,21 @@ const breedSearching = ref(false)
 const breedHasSearched = ref(false)
 const breedResult = ref(null)
 const breedCandidates = ref([])
+
+const shinySearching = ref(false)
+const shinyHasSearched = ref(false)
+const shinyResult = ref(null)
+const shinyCandidates = ref([])
+
+const shinyOwnedDraftName = ref('')
+const shinyOwnedDraftGender = ref('female')
+const shinyOwnedList = ref([])
+
 const shinyPets = ref(new Set())
 
 const shinySeedPets = new Set(SHINY_SEED_PETS)
 const noBreedPets = new Set(NO_BREED_PETS)
+const shinyFemaleOnlyPets = new Set(['雪影娃娃'])
 
 const groupIndex = ref({
   groupsByPet: new Map(),
@@ -50,6 +61,7 @@ const groupIndex = ref({
   stageToChainText: new Map(),
   baseToMembers: new Map(),
   baseToChain: new Map(),
+  baseToChains: new Map(),
   allPetNames: new Set()
 })
 
@@ -116,6 +128,51 @@ const themeModeLabel = computed(() => (themeMode.value === 'light' ? '浅色' : 
 const themeIcon = computed(() => (themeMode.value === 'light' ? Sunny : themeMode.value === 'dark' ? Moon : Monitor))
 const activeTheme = computed(() => (themeMode.value === 'auto' ? (systemDark.value ? 'dark' : 'light') : themeMode.value))
 const shinyVisualActive = computed(() => forceShiny.value && canEnableShinySwitch())
+const shinyPetOptions = computed(() => {
+  const finals = new Set()
+  for (const name of shinyPets.value) {
+    finals.add(groupIndex.value.stageToFinal.get(name) || name)
+  }
+  return [...finals].sort((a, b) => a.localeCompare(b, 'zh-CN'))
+})
+
+function addShinyOwned() {
+  const name = (shinyOwnedDraftName.value || '').trim()
+  if (!name) {
+    ElMessage.warning('请先选择已有异色精灵')
+    return
+  }
+
+  const finalName = groupIndex.value.stageToFinal.get(name) || name
+  if (!shinyPetOptions.value.includes(finalName)) {
+    ElMessage.warning('仅可添加异色精灵')
+    return
+  }
+
+  if (shinyFemaleOnlyPets.has(finalName) && shinyOwnedDraftGender.value === 'male') {
+    ElMessage.warning(`${finalName} 无雄性，仅可添加雌性`)
+    return
+  }
+
+  const key = `${finalName}::${shinyOwnedDraftGender.value}`
+  const exists = shinyOwnedList.value.some((x) => `${x.name}::${x.gender}` === key)
+  if (exists) {
+    ElMessage.info('该已有异色记录已存在')
+    return
+  }
+
+  shinyOwnedList.value = [
+    ...shinyOwnedList.value,
+    { name: finalName, gender: shinyOwnedDraftGender.value }
+  ].sort((a, b) => a.name.localeCompare(b.name, 'zh-CN'))
+
+  shinyOwnedDraftName.value = ''
+  ElMessage.success('已添加到已有异色清单')
+}
+
+function removeShinyOwned(item) {
+  shinyOwnedList.value = shinyOwnedList.value.filter((x) => !(x.name === item.name && x.gender === item.gender))
+}
 
 function setMode(mode) {
   currentMode.value = mode
@@ -270,6 +327,7 @@ function buildGroupIndex(masterNames, evolutionChains) {
   const stageToChainText = new Map()
   const baseToMembers = new Map()
   const baseToChain = new Map()
+  const baseToChains = new Map()
   const allPetNames = new Set(masterNames)
 
   const addGroup = (pet, group) => {
@@ -298,6 +356,8 @@ function buildGroupIndex(masterNames, evolutionChains) {
     for (const name of names) memberSet.add(name)
 
     if (!baseToChain.has(base)) baseToChain.set(base, names)
+    if (!baseToChains.has(base)) baseToChains.set(base, [])
+    baseToChains.get(base).push(names)
 
     for (const name of names) {
       stageToBase.set(name, base)
@@ -322,7 +382,7 @@ function buildGroupIndex(masterNames, evolutionChains) {
     }
   }
 
-  return { groupsByPet, stageToBase, stageToFinal, stageToChainText, baseToMembers, baseToChain, allPetNames }
+  return { groupsByPet, stageToBase, stageToFinal, stageToChainText, baseToMembers, baseToChain, baseToChains, allPetNames }
 }
 
 async function loadDataset() {
@@ -351,14 +411,29 @@ async function loadDataset() {
     groupIndex.value = buildGroupIndex(masterNames, evolutionChains)
 
     const shinySet = new Set()
+    const { allPetNames, stageToBase, stageToFinal, baseToChains } = groupIndex.value
     for (const rawName of shinySeedPets) {
       const seedName = normalizeBreedingName(rawName)
-      const base = groupIndex.value.stageToBase.get(seedName) || seedName
-      const members = groupIndex.value.baseToMembers.get(base)
-      if (members && members.size > 0) {
-        for (const m of members) shinySet.add(m)
-      } else {
-        shinySet.add(seedName)
+      if (!seedName || !allPetNames.has(seedName)) continue
+
+      const base = stageToBase.get(seedName) || seedName
+      const chains = baseToChains.get(base) || []
+
+      if (chains.length > 0) {
+        for (const chain of chains) {
+          if (!Array.isArray(chain) || chain.length === 0) continue
+          const idx = chain.indexOf(seedName)
+          if (idx === -1) continue
+          for (let i = idx; i < chain.length; i++) {
+            const name = chain[i]
+            if (allPetNames.has(name)) shinySet.add(name)
+          }
+        }
+      }
+
+      if (!shinySet.has(seedName)) {
+        const finalName = stageToFinal.get(seedName) || seedName
+        if (allPetNames.has(finalName)) shinySet.add(finalName)
       }
     }
     shinyPets.value = shinySet
@@ -391,6 +466,7 @@ async function loadDataset() {
       stageToChainText: new Map(),
       baseToMembers: new Map(),
       baseToChain: new Map(),
+      baseToChains: new Map(),
       allPetNames: new Set()
     }
     ElMessage.error('数据加载失败，请检查 public/data/*.json')
@@ -546,6 +622,293 @@ function onBreedReset() {
   breedHasSearched.value = false
   breedResult.value = null
   breedCandidates.value = []
+}
+
+function onShinyReset() {
+  shinyHasSearched.value = false
+  shinyResult.value = null
+  shinyCandidates.value = []
+  shinyOwnedDraftName.value = ''
+  shinyOwnedDraftGender.value = 'female'
+}
+
+function buildShinyCollectionPlan({ seedFinals, candidates, groupsByPet, stageToFinal, ownedFinalSet, ownedGenderMap }) {
+  const normalizedSeeds = [...new Set(seedFinals.map((x) => stageToFinal.get(x) || x).filter(Boolean))]
+  const nodes = [...new Set([...normalizedSeeds, ...candidates.map((c) => c.fatherPet)])]
+  const candidateGroupMap = new Map(candidates.map((c) => [c.fatherPet, new Set(c.fatherAllGroups)]))
+
+  const getGroups = (pet) => {
+    const fromIndex = groupsByPet.get(pet)
+    if (fromIndex && fromIndex.size > 0) return new Set(fromIndex)
+    if (candidateGroupMap.has(pet)) return new Set(candidateGroupMap.get(pet))
+    return new Set()
+  }
+
+  const groupTextOf = (pet) => {
+    const groups = [...getGroups(pet)].sort((a, b) => a.localeCompare(b, 'zh-CN'))
+    return groups.length ? groups.join(' / ') : '无蛋组'
+  }
+
+  const graph = new Map(nodes.map((n) => [n, new Set()]))
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      const a = nodes[i]
+      const b = nodes[j]
+      const aGroups = getGroups(a)
+      const bGroups = getGroups(b)
+      let connected = false
+      for (const g of aGroups) {
+        if (bGroups.has(g)) {
+          connected = true
+          break
+        }
+      }
+      if (connected) {
+        graph.get(a).add(b)
+        graph.get(b).add(a)
+      }
+    }
+  }
+
+  const available = new Set([...ownedFinalSet, ...normalizedSeeds])
+
+  const malePool = new Set()
+  for (const [pet, genders] of (ownedGenderMap || new Map()).entries()) {
+    if (!shinyFemaleOnlyPets.has(pet) && genders?.has('male')) malePool.add(pet)
+  }
+
+  const distance = new Map()
+  const bfsQueue = []
+  for (const seed of normalizedSeeds) {
+    distance.set(seed, 0)
+    bfsQueue.push(seed)
+  }
+  while (bfsQueue.length > 0) {
+    const cur = bfsQueue.shift()
+    const curDist = distance.get(cur) ?? 0
+    for (const nxt of graph.get(cur) || []) {
+      if (distance.has(nxt)) continue
+      distance.set(nxt, curDist + 1)
+      bfsQueue.push(nxt)
+    }
+  }
+
+  const genderText = (pet) => {
+    const genders = ownedGenderMap?.get(pet)
+    if (!genders || genders.size === 0) return ''
+    if (genders.has('female') && genders.has('male')) return '（雌/雄）'
+    return genders.has('female') ? '（雌性）' : '（雄性）'
+  }
+
+  const targets = [...nodes].sort((a, b) => {
+    const aDone = ownedFinalSet.has(a) || normalizedSeeds.includes(a)
+    const bDone = ownedFinalSet.has(b) || normalizedSeeds.includes(b)
+    if (aDone !== bDone) return aDone ? -1 : 1
+
+    const da = distance.get(a) ?? Number.MAX_SAFE_INTEGER
+    const db = distance.get(b) ?? Number.MAX_SAFE_INTEGER
+    if (da !== db) return da - db
+
+    return a.localeCompare(b, 'zh-CN')
+  })
+
+  const pendingTargets = targets.filter((pet) => !ownedFinalSet.has(pet) && !normalizedSeeds.includes(pet))
+
+  const needAsMaleDonor = (pet, pendingSet) => {
+    if (shinyFemaleOnlyPets.has(pet)) return false
+    for (const other of pendingSet) {
+      if (other === pet) continue
+      if ((graph.get(other) || new Set()).has(pet)) return true
+    }
+    return false
+  }
+
+  const cards = []
+  for (const seed of normalizedSeeds) {
+    cards.push({
+      title: `起点：${seed}${genderText(seed)}`,
+      target: seed,
+      groupText: groupTextOf(seed),
+      desc: '该异色已在你的已有清单中。',
+      status: 'done'
+    })
+  }
+
+  for (const pet of targets) {
+    if (normalizedSeeds.includes(pet)) continue
+
+    if (ownedFinalSet.has(pet)) {
+      cards.push({
+        title: `收集：${pet}${genderText(pet)}`,
+        target: pet,
+        groupText: groupTextOf(pet),
+        desc: '该异色已在你的已有清单中。',
+        status: 'done'
+      })
+      continue
+    }
+
+    let donorMale = null
+    for (const donor of malePool) {
+      if (donor === pet) continue
+      if ((graph.get(pet) || new Set()).has(donor)) {
+        donorMale = donor
+        break
+      }
+    }
+
+    const needMale = needAsMaleDonor(pet, pendingTargets)
+    const genderLabel = shinyFemaleOnlyPets.has(pet) ? '（雌性）' : (needMale ? '（雄性）' : '')
+
+    if (donorMale) {
+      cards.push({
+        title: `收集：${pet}${genderLabel}`,
+        target: pet,
+        groupText: groupTextOf(pet),
+        desc: '',
+        pair: {
+          female: pet,
+          male: donorMale
+        },
+        status: 'can'
+      })
+
+      available.add(pet)
+      if (needMale && !shinyFemaleOnlyPets.has(pet)) {
+        malePool.add(pet)
+      }
+    } else {
+      cards.push({
+        title: `收集：${pet}${genderLabel}`,
+        target: pet,
+        groupText: groupTextOf(pet),
+        desc: '当前不可直接获取，需先补齐可配对异色后再尝试。',
+        status: 'blocked'
+      })
+    }
+  }
+
+  const total = targets.length
+  const doneCount = targets.filter((t) => ownedFinalSet.has(t) || normalizedSeeds.includes(t)).length
+  const progress = total > 0 ? Number(((doneCount / total) * 100).toFixed(2)) : 0
+
+  const canGetSet = new Set(
+    cards
+      .filter((card) => card.target && (card.status === 'done' || card.status === 'can'))
+      .map((card) => card.target)
+  )
+
+  return {
+    targets,
+    cards,
+    total,
+    doneCount,
+    progress,
+    canGetSet
+  }
+}
+
+async function onShinySearch() {
+  if (!shinyOwnedList.value.length) {
+    ElMessage.warning('请先添加已有异色')
+    return
+  }
+
+  shinySearching.value = true
+  shinyHasSearched.value = true
+  await new Promise((resolve) => setTimeout(resolve, 220))
+
+  const { groupsByPet, stageToFinal, stageToChainText } = groupIndex.value
+
+  const seedFinals = [...new Set(
+    shinyOwnedList.value
+      .map((item) => stageToFinal.get(item.name) || item.name)
+      .filter(Boolean)
+  )]
+
+  if (!seedFinals.length) {
+    shinyResult.value = null
+    shinyCandidates.value = []
+    shinySearching.value = false
+    ElMessage.warning('已有异色清单无有效数据')
+    return
+  }
+
+  const candidateMap = new Map()
+  for (const [pet, gset] of groupsByPet.entries()) {
+    const finalPet = stageToFinal.get(pet) || pet
+    if (!shinyPets.value.has(finalPet)) continue
+
+    const fatherAllGroups = [...gset].sort((a, b) => a.localeCompare(b, 'zh-CN'))
+    const fatherChain = stageToChainText.get(pet) || stageToChainText.get(finalPet) || finalPet
+    const current = candidateMap.get(finalPet)
+
+    if (!current) {
+      candidateMap.set(finalPet, {
+        fatherPet: finalPet,
+        fatherChain,
+        fatherAllGroups: new Set(fatherAllGroups),
+        blockedByBreed: noBreedPets.has(finalPet)
+      })
+    } else {
+      for (const g of fatherAllGroups) current.fatherAllGroups.add(g)
+      if (current.fatherChain.length < fatherChain.length) current.fatherChain = fatherChain
+      current.blockedByBreed = current.blockedByBreed || noBreedPets.has(finalPet)
+    }
+  }
+
+  for (const finalPet of shinyPetOptions.value) {
+    if (!candidateMap.has(finalPet)) {
+      candidateMap.set(finalPet, {
+        fatherPet: finalPet,
+        fatherChain: stageToChainText.get(finalPet) || finalPet,
+        fatherAllGroups: new Set(),
+        blockedByBreed: noBreedPets.has(finalPet)
+      })
+    }
+  }
+
+  const candidates = [...candidateMap.values()]
+    .map((item) => ({
+      fatherPet: item.fatherPet,
+      fatherChain: item.fatherChain,
+      fatherAllGroups: [...item.fatherAllGroups].sort((a, b) => a.localeCompare(b, 'zh-CN')),
+      blockedByBreed: item.blockedByBreed
+    }))
+    .sort((a, b) => a.fatherPet.localeCompare(b.fatherPet, 'zh-CN'))
+
+  const ownedFinalSet = new Set(seedFinals)
+  const ownedGenderMap = new Map()
+  for (const item of shinyOwnedList.value) {
+    const finalName = stageToFinal.get(item.name) || item.name
+    if (!ownedGenderMap.has(finalName)) ownedGenderMap.set(finalName, new Set())
+    ownedGenderMap.get(finalName).add(item.gender)
+  }
+
+  const routePlan = buildShinyCollectionPlan({
+    seedFinals,
+    candidates,
+    groupsByPet,
+    stageToFinal,
+    ownedFinalSet,
+    ownedGenderMap
+  })
+
+  shinyResult.value = {
+    routePlan
+  }
+
+  const canGetSet = routePlan.canGetSet || new Set()
+  shinyCandidates.value = candidates
+    .map((item) => ({
+      ...item,
+      canGet: canGetSet.has(item.fatherPet) && !item.blockedByBreed
+    }))
+    .sort((a, b) => {
+      if (a.canGet !== b.canGet) return a.canGet ? -1 : 1
+      return a.fatherPet.localeCompare(b.fatherPet, 'zh-CN')
+    })
+  shinySearching.value = false
 }
 
 function resolveTargetName(inputName) {
@@ -816,6 +1179,8 @@ onBeforeUnmount(() => {
             </template>
           </el-skeleton>
         </section>
+
+
       </main>
     </template>
 
@@ -829,6 +1194,9 @@ onBeforeUnmount(() => {
             </button>
             <button type="button" class="inner-switch-btn" :class="{ active: groupSubMode === 'breed' }" @click="setGroupSubMode('breed')">
               繁殖查询
+            </button>
+            <button type="button" class="inner-switch-btn" :class="{ active: groupSubMode === 'shiny' }" @click="setGroupSubMode('shiny')">
+              异色孵化
             </button>
           </section>
 
@@ -849,7 +1217,7 @@ onBeforeUnmount(() => {
             </div>
           </el-form>
 
-          <el-form v-else label-position="top" class="search-form" @submit.prevent>
+          <el-form v-else-if="groupSubMode === 'breed'" label-position="top" class="search-form" @submit.prevent>
             <div class="grid">
               <el-form-item label="目标精灵（母系）">
                 <el-input v-model="breedTargetName" placeholder="例如：魔力猫、火神、书魔虫" clearable size="large" @keyup.enter="onBreedSearch" />
@@ -870,6 +1238,42 @@ onBeforeUnmount(() => {
               <el-button class="reset-btn" size="large" :icon="Refresh" @click="onBreedReset">重置</el-button>
               <el-button class="query-btn" type="primary" size="large" :icon="Search" :loading="breedSearching || loadingData" @click="onBreedSearch">
                 查询繁殖方案
+              </el-button>
+            </div>
+          </el-form>
+
+          <el-form v-else label-position="top" class="search-form" @submit.prevent>
+            <div class="grid">
+              <el-form-item label="添加已有异色">
+                <div class="owned-add-row">
+                  <el-select v-model="shinyOwnedDraftName" filterable clearable placeholder="选择已有异色精灵" size="large" class="owned-add-select">
+                    <el-option v-for="name in shinyPetOptions" :key="`owned-opt-${name}`" :label="name" :value="name" />
+                  </el-select>
+                  <el-radio-group v-model="shinyOwnedDraftGender" size="large">
+                    <el-radio-button label="female">雌性</el-radio-button>
+                    <el-radio-button label="male">雄性</el-radio-button>
+                  </el-radio-group>
+                  <el-button class="query-btn owned-add-btn" type="primary" size="large" @click="addShinyOwned">+ 添加</el-button>
+                </div>
+                <div v-if="shinyOwnedList.length" class="group-tags">
+                  <el-tag
+                    v-for="(item, idx) in shinyOwnedList"
+                    :key="`owned-${idx}-${item.name}-${item.gender}`"
+                    closable
+                    effect="light"
+                    round
+                    @close="removeShinyOwned(item)"
+                  >
+                    {{ item.name }}·{{ item.gender === 'female' ? '雌' : '雄' }}
+                  </el-tag>
+                </div>
+                <p class="switch-hint">查询会自动引用你已添加的异色清单进行路线规划。</p>
+              </el-form-item>
+            </div>
+            <div class="actions">
+              <el-button class="reset-btn" size="large" :icon="Refresh" @click="onShinyReset">重置</el-button>
+              <el-button class="query-btn" type="primary" size="large" :icon="Search" :loading="shinySearching || loadingData" @click="onShinySearch">
+                查询异色孵化
               </el-button>
             </div>
           </el-form>
@@ -905,7 +1309,7 @@ onBeforeUnmount(() => {
           </el-skeleton>
         </section>
 
-        <section class="result-card" v-else>
+        <section class="result-card" v-else-if="groupSubMode === 'breed'">
           <div class="result-header">
             <h2>繁殖匹配结果</h2>
             <el-tag v-if="breedHasSearched" type="success" effect="light" round>父系候选 {{ breedCandidates.length }} 个</el-tag>
@@ -936,6 +1340,78 @@ onBeforeUnmount(() => {
                       <div class="title-row">
                         <h3 class="group-pet-name">{{ item.fatherPet }}</h3>
                         <span class="pet-id">{{ item.isSameChain ? '同进化链' : '可配对' }}</span>
+                      </div>
+                      <p class="chain-text">{{ item.fatherChain }}</p>
+                      <div class="group-tags">
+                        <el-tag v-for="group in item.fatherAllGroups" :key="`${item.fatherPet}-${group}`" effect="light" round>{{ group }}</el-tag>
+                      </div>
+                    </div>
+                  </article>
+                </transition-group>
+              </div>
+            </template>
+          </el-skeleton>
+        </section>
+
+        <section class="result-card" v-else>
+          <div class="result-header">
+            <h2>异色孵化结果</h2>
+            <el-tag v-if="shinyHasSearched" type="success" effect="light" round>异色父系 {{ shinyCandidates.length }} 个</el-tag>
+            <el-tag v-else type="info" effect="light" round>待查询</el-tag>
+          </div>
+
+          <el-skeleton :loading="shinySearching || loadingData" animated :rows="7">
+            <template #default>
+              <div v-if="!shinyHasSearched" class="empty">添加已有异色后点击查询，系统将规划全异色收集路线</div>
+              <div v-else-if="!shinyResult" class="empty">暂无可规划数据</div>
+              <div v-else>
+                <article v-if="shinyResult.routePlan" class="result-item group-summary group-summary-card">
+                  <div class="left">
+                    <div class="title-row">
+                      <h3>集齐异色路线规划</h3>
+                      <span class="pet-id">完成 {{ shinyResult.routePlan.doneCount }} / {{ shinyResult.routePlan.total }}</span>
+                    </div>
+
+                    <div class="group-tags">
+                      <el-tag v-for="name in shinyResult.routePlan.targets" :key="`route-target-${name}`" effect="light" round>{{ name }}</el-tag>
+                    </div>
+
+                    <div class="route-progress">
+                      <div class="route-progress-head">
+                        <span>当前进度</span>
+                        <span>{{ shinyResult.routePlan.progress }}%</span>
+                      </div>
+                      <el-progress :percentage="shinyResult.routePlan.progress" :stroke-width="12" :show-text="false" />
+                    </div>
+
+                    <div class="route-cards">
+                      <article
+                        v-for="(card, idx) in shinyResult.routePlan.cards.filter((x) => x.status !== 'blocked')"
+                        :key="`route-card-${idx}`"
+                        class="route-card"
+                        :class="{ done: card.status === 'done', can: card.status === 'can' }"
+                      >
+                        <div class="title-row">
+                          <h3 class="group-pet-name">{{ card.title }}</h3>
+                          <span class="pet-id">{{ card.groupText || '无蛋组' }}</span>
+                        </div>
+                        <p v-if="card.status === 'can' && card.pair" class="chain-text">
+                          普通雌性 <span class="sex-female">{{ card.pair.female }}</span> × 已有异色雄性 <span class="sex-male">{{ card.pair.male }}</span>。
+                        </p>
+                        <p v-else class="chain-text">{{ card.desc }}</p>
+                      </article>
+                    </div>
+                  </div>
+                </article>
+
+                <div v-if="!shinyCandidates.length" class="empty">没有可匹配的异色父系候选</div>
+
+                <transition-group v-else name="rank" tag="div" class="group-result-list">
+                  <article v-for="item in shinyCandidates" :key="item.fatherPet" class="result-item group-item">
+                    <div class="left">
+                      <div class="title-row">
+                        <h3 class="group-pet-name">{{ item.fatherPet }}</h3>
+                        <span class="pet-id">{{ item.canGet ? '可获取（可孵化）' : '不可获取（当前条件）' }}</span>
                       </div>
                       <p class="chain-text">{{ item.fatherChain }}</p>
                       <div class="group-tags">
@@ -1093,7 +1569,7 @@ onBeforeUnmount(() => {
 
 .inner-switch-card {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   margin-bottom: 14px;
 }
@@ -1212,7 +1688,7 @@ onBeforeUnmount(() => {
 
 .group-result-list {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 10px;
 }
 
@@ -1296,10 +1772,77 @@ onBeforeUnmount(() => {
   font-size: 12px;
 }
 
+.route-progress {
+  margin-top: 10px;
+}
+
+.route-progress-head {
+  display: flex;
+  justify-content: space-between;
+  color: var(--app-text-soft);
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.route-cards {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.route-card {
+  border: 1px solid var(--app-tag-border);
+  border-radius: 12px;
+  padding: 10px;
+  background: var(--app-item-bg);
+}
+
+.route-card.done {
+  border-color: #67c23a;
+  background: rgba(103, 194, 58, 0.08);
+}
+
+.route-card.can {
+  border-color: #409eff;
+  background: rgba(64, 158, 255, 0.1);
+}
+
+.route-card.blocked {
+  border-color: #f56c6c;
+  background: rgba(245, 108, 108, 0.1);
+}
+
+.sex-female {
+  color: #ec4899;
+  font-weight: 700;
+}
+
+.sex-male {
+  color: #22c55e;
+  font-weight: 700;
+}
+
 .switch-row {
   display: flex;
   align-items: center;
   min-height: 40px;
+}
+
+.owned-add-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.owned-add-select {
+  width: 100%;
+}
+
+.owned-add-btn {
+  width: 108px !important;
+  justify-self: end;
 }
 
 .switch-hint {

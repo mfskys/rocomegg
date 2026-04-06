@@ -258,6 +258,7 @@ export const EGG_GROUP_INPUT = Object.freeze({
 
 export const SHINY_SEED_PETS = Object.freeze([
   "恶魔狼",
+  "獠牙猪",
   "月牙雪熊",
   "雅丹鬃",
   "红绒十字",
@@ -267,13 +268,14 @@ export const SHINY_SEED_PETS = Object.freeze([
   "空空颅",
   "粉星仔",
   "窃光蚊",
-  "陨星虫",
   "利灯鱼",
   "贝瑟",
   "立方人",
   "酷拉",
   "小皮球",
   "雪影娃娃",
+  "绒仙子",
+  "疾光千兽",
 ]);
 
 export const NO_BREED_PETS = Object.freeze([
