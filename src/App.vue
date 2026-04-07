@@ -29,6 +29,7 @@ const surveyUrl = 'https://f.wps.cn/ksform/w/write/YUmapbHA/#routePromt'
 const sharingPoster = ref(false)
 const sharingCapture = ref(false)
 const shareImageUrl = ref('')
+const shareImagesReady = ref(true)
 
 const groupKeyword = ref('')
 const groupStage = ref('')
@@ -280,6 +281,16 @@ function getCreatureImageUrl(petId) {
   const id = normalizePetId(petId)
   if (!id) return ''
   return `${import.meta.env.BASE_URL || '/'}creature-id-images/${id}.png`
+}
+
+function updateShareImagesReady() {
+  if (typeof document === 'undefined') return
+  const imgs = Array.from(document.querySelectorAll('.share-poster-target img'))
+  if (imgs.length === 0) {
+    shareImagesReady.value = true
+    return
+  }
+  shareImagesReady.value = imgs.every((img) => img.complete && img.naturalWidth > 0)
 }
 
 function evaluateRow(diameter, weight, row) {
@@ -534,6 +545,7 @@ function onReset() {
   candidates.value = []
   searchMode.value = 'matched'
   shareImageUrl.value = ''
+  shareImagesReady.value = true
 }
 
 function onOpenSurvey() {
@@ -586,6 +598,12 @@ async function onShareLongImage() {
 
   if (shareImageUrl.value) {
     await onDownloadShareImage()
+    return
+  }
+
+  updateShareImagesReady()
+  if (!shareImagesReady.value) {
+    ElMessage.warning('候选精灵图片仍在加载，请稍后再分享长图')
     return
   }
 
@@ -700,6 +718,7 @@ async function onSearch() {
   }
 
   shareImageUrl.value = ''
+  shareImagesReady.value = false
   searching.value = true
   hasSearched.value = true
   await new Promise((resolve) => setTimeout(resolve, 220))
@@ -733,6 +752,10 @@ async function onSearch() {
       candidates.value = normalizeProbabilities(aggregateByPet(nearestRows).slice(0, 8))
     }
 
+    await nextTick()
+    updateShareImagesReady()
+    await nextTick()
+    updateShareImagesReady()
     searching.value = false
     return
   }
@@ -761,6 +784,8 @@ async function onSearch() {
       candidates.value = normalizeProbabilities(aggregateByPet(nearestRows).slice(0, 8))
     }
 
+    await nextTick()
+    updateShareImagesReady()
     searching.value = false
     return
   }
@@ -805,6 +830,8 @@ async function onSearch() {
 
   searchMode.value = 'nearest'
   candidates.value = normalizeProbabilities(aggregateByPet(scoredRows.sort((a, b) => b._score - a._score).slice(0, 24)).slice(0, 8))
+  await nextTick()
+  updateShareImagesReady()
   searching.value = false
 }
 
@@ -1425,7 +1452,7 @@ onBeforeUnmount(() => {
                 class="share-btn"
                 size="large"
                 :loading="sharingPoster"
-                :disabled="searching || loadingData"
+                :disabled="searching || loadingData || (!shareImageUrl && !shareImagesReady)"
                 @click="onShareLongImage"
               >
                 {{ shareImageUrl ? '点击下载' : '分享长图' }}
@@ -1470,7 +1497,7 @@ onBeforeUnmount(() => {
                     <div class="left">
                       <div class="pet-row">
                         <div class="pet-avatar" v-if="getCreatureImageUrl(item.petId)">
-                          <img :src="getCreatureImageUrl(item.petId)" :alt="item.pet" loading="lazy" />
+                          <img :src="getCreatureImageUrl(item.petId)" :alt="item.pet" loading="lazy" @load="updateShareImagesReady" @error="updateShareImagesReady" />
                         </div>
                         <div class="pet-meta">
                           <div class="title-row">
@@ -1497,7 +1524,7 @@ onBeforeUnmount(() => {
                     <div class="left">
                       <div class="pet-row">
                         <div class="pet-avatar" v-if="getCreatureImageUrl(item.petId)">
-                          <img :src="getCreatureImageUrl(item.petId)" :alt="item.pet" loading="lazy" />
+                          <img :src="getCreatureImageUrl(item.petId)" :alt="item.pet" loading="lazy" @load="updateShareImagesReady" @error="updateShareImagesReady" />
                         </div>
                         <div class="pet-meta">
                           <div class="title-row">
