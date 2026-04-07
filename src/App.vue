@@ -2,6 +2,8 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Search, Refresh, Sunny, Moon, Monitor } from '@element-plus/icons-vue'
+import html2canvas from 'html2canvas'
+import QRCode from 'qrcode'
 import {
   BREEDING_RULE_TEXT,
   EGG_GROUP_INPUT,
@@ -25,6 +27,8 @@ const exactResults = ref([])
 const candidates = ref([])
 const searchMode = ref('matched')
 const surveyUrl = 'https://f.wps.cn/ksform/w/write/YUmapbHA/#routePromt'
+const sharingPoster = ref(false)
+const shareImageUrl = ref('')
 
 const groupKeyword = ref('')
 const groupStage = ref('')
@@ -483,10 +487,141 @@ function onReset() {
   exactResults.value = []
   candidates.value = []
   searchMode.value = 'matched'
+  shareImageUrl.value = ''
 }
 
 function onOpenSurvey() {
   window.open(surveyUrl, '_blank', 'noopener,noreferrer')
+}
+
+function downloadDataUrl(dataUrl, fileName = 'rocom-share.png') {
+  const a = document.createElement('a')
+  a.href = dataUrl
+  a.download = fileName
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+}
+
+function buildShareFileName() {
+  const normalize = (value) => {
+    const text = String(value ?? '').trim()
+    if (!text) return 'na'
+    return text.replace(/[^\d.]+/g, '_').replace(/_+/g, '_')
+  }
+
+  const d = normalize(diameterInput.value)
+  const w = normalize(weightInput.value)
+  return `rocom-share_d${d}_w${w}.png`
+}
+
+async function onDownloadShareImage() {
+  if (!shareImageUrl.value) {
+    ElMessage.warning('暂无可下载图片，请先生成分享长图')
+    return
+  }
+  downloadDataUrl(shareImageUrl.value, buildShareFileName())
+}
+
+function buildShareQueryUrl() {
+  const url = new URL(window.location.href)
+  url.searchParams.set('mode', 'size')
+  url.searchParams.set('d', String(diameterInput.value || '').trim())
+  url.searchParams.set('w', String(weightInput.value || '').trim())
+  url.searchParams.set('auto', '1')
+  return url.toString()
+}
+
+async function onShareLongImage() {
+  if (!hasSearched.value) {
+    ElMessage.warning('请先查询后再生成分享长图')
+    return
+  }
+
+  if (shareImageUrl.value) {
+    await onDownloadShareImage()
+    return
+  }
+
+  if (typeof window === 'undefined' || typeof document === 'undefined') return
+
+  sharingPoster.value = true
+  try {
+    const target =
+      document.querySelector('.panel') ||
+      document.querySelector('.page')
+
+    if (!target) {
+      ElMessage.warning('未找到可截图区域')
+      return
+    }
+
+    const canvas = await html2canvas(target, {
+      backgroundColor: '#ffffff',
+      useCORS: true,
+      scale: Math.max(2, window.devicePixelRatio || 1),
+      windowWidth: Math.max(document.documentElement.clientWidth, target.scrollWidth),
+      windowHeight: Math.max(target.scrollHeight, target.clientHeight),
+      scrollX: 0,
+      scrollY: -window.scrollY
+    })
+
+    const qrDataUrl = await QRCode.toDataURL(buildShareQueryUrl(), {
+      width: 240,
+      margin: 1,
+      color: { dark: '#111827', light: '#ffffff' }
+    })
+
+    const footerHeight = 260
+    const output = document.createElement('canvas')
+    output.width = canvas.width
+    output.height = canvas.height + footerHeight
+    const ctx = output.getContext('2d')
+
+    if (!ctx) {
+      ElMessage.warning('生成图片失败，请重试')
+      return
+    }
+
+    ctx.fillStyle = '#ffffff'
+    ctx.fillRect(0, 0, output.width, output.height)
+    ctx.drawImage(canvas, 0, 0)
+
+    const qr = new Image()
+    qr.src = qrDataUrl
+    await new Promise((resolve, reject) => {
+      qr.onload = resolve
+      qr.onerror = reject
+    })
+
+    const padding = 28
+    const qrSize = 170
+    const qrX = output.width - qrSize - padding
+    const qrY = canvas.height + (footerHeight - qrSize) / 2
+
+    ctx.fillStyle = '#111827'
+    ctx.font = 'bold 34px sans-serif'
+    ctx.fillText('洛克王国世界工具站', padding, canvas.height + 92)
+
+    ctx.fillStyle = '#4b5563'
+    ctx.font = '24px sans-serif'
+    ctx.fillText('扫码自动回填尺寸与重量并查询', padding, canvas.height + 138)
+    ctx.fillText('长按图片可保存到手机', padding, canvas.height + 176)
+
+    ctx.strokeStyle = '#e5e7eb'
+    ctx.lineWidth = 2
+    ctx.strokeRect(qrX - 10, qrY - 10, qrSize + 20, qrSize + 20)
+    ctx.drawImage(qr, qrX, qrY, qrSize, qrSize)
+
+    const dataUrl = output.toDataURL('image/png')
+    shareImageUrl.value = dataUrl
+    ElMessage.success('长图已生成，点击“点击下载”按钮保存')
+  } catch (err) {
+    console.error(err)
+    ElMessage.warning('分享长图生成失败，请稍后重试')
+  } finally {
+    sharingPoster.value = false
+  }
 }
 
 async function onSearch() {
@@ -506,6 +641,7 @@ async function onSearch() {
     return
   }
 
+  shareImageUrl.value = ''
   searching.value = true
   hasSearched.value = true
   await new Promise((resolve) => setTimeout(resolve, 220))
@@ -1069,9 +1205,35 @@ async function onBreedSearch() {
   breedSearching.value = false
 }
 
-onMounted(() => {
+function applySharedParamsFromUrl() {
+  if (typeof window === 'undefined') return
+
+  const params = new URLSearchParams(window.location.search)
+  const d = (params.get('d') || '').trim()
+  const w = (params.get('w') || '').trim()
+  const mode = (params.get('mode') || '').trim()
+
+  if (mode === 'size') currentMode.value = 'size'
+  if (!d || !w) return
+
+  const dNum = Number(d)
+  const wNum = Number(w)
+  if (!Number.isFinite(dNum) || !Number.isFinite(wNum) || dNum <= 0 || wNum <= 0) return
+
+  diameterInput.value = d
+  weightInput.value = w
+
+  if (params.get('auto') === '1') {
+    setTimeout(() => {
+      onSearch()
+    }, 0)
+  }
+}
+
+onMounted(async () => {
   initThemeMode()
-  loadDataset()
+  await loadDataset()
+  applySharedParamsFromUrl()
 })
 
 onBeforeUnmount(() => {
@@ -1138,6 +1300,16 @@ onBeforeUnmount(() => {
                 @click="onSearch"
               >
                 立即查询
+              </el-button>
+              <el-button
+                v-if="hasSearched"
+                class="share-btn"
+                size="large"
+                :loading="sharingPoster"
+                :disabled="searching || loadingData"
+                @click="onShareLongImage"
+              >
+                {{ shareImageUrl ? '点击下载' : '分享长图' }}
               </el-button>
             </div>
           </el-form>
@@ -1681,6 +1853,16 @@ onBeforeUnmount(() => {
   background: #ffffff !important;
   color: var(--app-primary) !important;
 }
+
+.share-btn {
+  border-radius: 999px !important;
+  border: 1px dashed var(--app-primary-soft) !important;
+  padding: 12px 26px !important;
+  background: var(--app-tag-bg) !important;
+  color: var(--app-primary) !important;
+}
+
+
 
 .result-header {
   display: flex;
