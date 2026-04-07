@@ -5,7 +5,6 @@ import { Search, Refresh, Sunny, Moon, Monitor } from '@element-plus/icons-vue'
 import html2canvas from 'html2canvas'
 import QRCode from 'qrcode'
 import {
-  BREEDING_RULE_TEXT,
   EGG_GROUP_INPUT,
   SHINY_SEED_PETS,
   NO_BREED_PETS,
@@ -73,6 +72,14 @@ const eggGroupInput = EGG_GROUP_INPUT
 const groupStageOptions = computed(() =>
   Object.keys(eggGroupInput).sort((a, b) => a.localeCompare(b, 'zh-CN'))
 )
+const datasetCount = computed(() => rawItems.value.length)
+const groupModeHint = computed(() => {
+  if (groupSubMode.value === 'group') return '可单独查询精灵蛋组或者查询独自的蛋组，互斥'
+  if (groupSubMode.value === 'breed') {
+    return '孵蛋规则：需要同蛋组精灵，并且是一公一母；孵化出来的为母系精灵。父母均为普通精灵时，小概率出现异色/炫彩精灵；父母有异色/炫彩时，蛋出现异色/炫彩概率提高。'
+  }
+  return '添加异色清单，查询会自动引用你已添加的异色清单进行路线规划。'
+})
 
 const THEME_STORAGE_KEY = 'rocom_theme_mode'
 const themeMode = ref('auto')
@@ -1297,6 +1304,11 @@ onBeforeUnmount(() => {
     <template v-if="currentMode === 'size'">
       <main class="panel">
         <section class="search-card">
+          <h3>数据个数：<span style="color: var(--app-primary); font-weight: 800;">{{ datasetCount }}</span></h3>
+          <p class="chain-text">可进行查询精灵蛋数据，同时可进行投稿</p>
+        </section>
+
+        <section class="search-card">
           <h2>查询条件</h2>
           <el-form label-position="top" class="search-form" @submit.prevent>
             <div class="grid">
@@ -1413,6 +1425,13 @@ onBeforeUnmount(() => {
     <template v-else>
       <main class="panel">
         <section class="search-card">
+          <div class="title-row">
+            <h3>模式说明</h3>
+          </div>
+          <p class="chain-text">{{ groupModeHint }}</p>
+        </section>
+
+        <section class="search-card">
           <h2>查询模式</h2>
           <section class="inner-switch-card">
             <button type="button" class="inner-switch-btn" :class="{ active: groupSubMode === 'group' }" @click="setGroupSubMode('group')">
@@ -1425,6 +1444,8 @@ onBeforeUnmount(() => {
               异色孵化
             </button>
           </section>
+
+
 
           <el-form v-if="groupSubMode === 'group'" label-position="top" class="search-form" @submit.prevent>
             <div class="grid">
@@ -1472,7 +1493,6 @@ onBeforeUnmount(() => {
                     inactive-text="全部父系"
                   />
                 </div>
-                <p class="switch-hint">{{ BREEDING_RULE_TEXT }}</p>
               </el-form-item>
             </div>
             <div class="actions">
@@ -1508,7 +1528,6 @@ onBeforeUnmount(() => {
                     {{ item.name }}·{{ item.gender === 'female' ? '雌' : '雄' }}
                   </el-tag>
                 </div>
-                <p class="switch-hint">查询会自动引用你已添加的异色清单进行路线规划。</p>
               </el-form-item>
             </div>
             <div class="actions">
