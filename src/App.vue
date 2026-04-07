@@ -1280,10 +1280,10 @@ onBeforeUnmount(() => {
           <h2>查询条件</h2>
           <el-form label-position="top" class="search-form" @submit.prevent>
             <div class="grid">
-              <el-form-item label="蛋尺寸（m）" :class="{ 'shiny-field': shinyVisualActive }">
+              <el-form-item label="蛋尺寸" :class="{ 'shiny-field': shinyVisualActive }">
                 <el-input v-model="diameterInput" type="number" step="0.001" placeholder="例如：0.58" clearable size="large" />
               </el-form-item>
-              <el-form-item label="蛋重量（kg）" :class="{ 'shiny-field': shinyVisualActive }">
+              <el-form-item label="蛋重量" :class="{ 'shiny-field': shinyVisualActive }">
                 <el-input v-model="weightInput" type="number" step="0.001" placeholder="例如：8.6" clearable size="large" />
               </el-form-item>
             </div>
