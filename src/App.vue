@@ -280,8 +280,8 @@ function evaluateRow(diameter, weight, row) {
   const dPoint = isPointRange(row.diameterRange)
   const wPoint = isPointRange(row.weightRange)
 
-  const exactDiameterTolerance = 0.005
-  const exactWeightTolerance = 0.08
+  const exactDiameterTolerance = 0.01
+  const exactWeightTolerance = 0.1
 
   const exact =
     dPoint &&
@@ -1349,7 +1349,7 @@ onBeforeUnmount(() => {
               <div v-else-if="!exactResults.length && !candidates.length" class="empty">未查询到候选精灵</div>
 
               <div v-if="exactResults.length" class="exact-block">
-                <div class="sub-head">完全命中（精确记录，容差：尺寸 ±0.005，重量 ±0.08）</div>
+                <div class="sub-head">完全命中（精确记录，容差：尺寸 ±0.01，重量 ±0.1）</div>
                 <transition-group name="rank" tag="div" class="result-list">
                   <article v-for="(item, index) in exactResults" :key="`exact-${item.petId}-${index}`" class="result-item exact-item">
                     <div class="left">
