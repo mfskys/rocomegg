@@ -1,5 +1,5 @@
 {
-  "total": 477,
+  "total": 483,
   "items": [
     {
       "id": 1,
@@ -718,7 +718,7 @@
     {
       "id": 128,
       "eggDiameter": "0.13-0.2",
-      "eggWeight": "0.038-0.108",
+      "eggWeight": "0.03-0.108",
       "pet": "蒲公英"
     },
     {
@@ -1474,7 +1474,7 @@
     {
       "id": 257,
       "eggDiameter": "0.188-0.24",
-      "eggWeight": "1.853-2.468",
+      "eggWeight": "1.727-2.468",
       "pet": "斑斑"
     },
     {
@@ -1654,7 +1654,7 @@
     {
       "id": 287,
       "eggDiameter": "0.26-0.56",
-      "eggWeight": "4.305-14.148",
+      "eggWeight": "2.363-14.148",
       "pet": "火红尾"
     },
     {
@@ -2862,6 +2862,42 @@
       "eggDiameter": "0.24",
       "eggWeight": "2.611",
       "pet": "灵狐"
+    },
+    {
+      "id": 489,
+      "eggDiameter": "0.2",
+      "eggWeight": "1.657",
+      "pet": "格兰种子"
+    },
+    {
+      "id": 490,
+      "eggDiameter": "0.26",
+      "eggWeight": "2.363",
+      "pet": "火红尾"
+    },
+    {
+      "id": 491,
+      "eggDiameter": "0.19",
+      "eggWeight": "4.315",
+      "pet": "粉星仔"
+    },
+    {
+      "id": 492,
+      "eggDiameter": "0.45",
+      "eggWeight": "2.942",
+      "pet": "古钟蛇"
+    },
+    {
+      "id": 493,
+      "eggDiameter": "0.2",
+      "eggWeight": "1.727",
+      "pet": "斑斑"
+    },
+    {
+      "id": 494,
+      "eggDiameter": "0.135",
+      "eggWeight": "0.03",
+      "pet": "蒲公英"
     }
   ]
 }
