@@ -1,5 +1,5 @@
 {
-  "total": 321,
+  "total": 326,
   "items": [
     {
       "id": 1,
@@ -123,8 +123,8 @@
     },
     {
       "id": 21,
-      "eggDiameter": "0.5~0.8",
-      "eggWeight": "19.72-26.321",
+      "eggDiameter": "0.46~0.8",
+      "eggWeight": "17.98-26.321",
       "pet": "锤头鹳"
     },
     {
@@ -261,8 +261,8 @@
     },
     {
       "id": 45,
-      "eggDiameter": "0.55~0.78",
-      "eggWeight": "28.466-36.709",
+      "eggDiameter": "0.52~0.78",
+      "eggWeight": "25.909-36.709",
       "pet": "恶魔狼"
     },
     {
@@ -988,7 +988,7 @@
     {
       "id": 174,
       "eggDiameter": "0.35~0.55",
-      "eggWeight": "6.42~6.727",
+      "eggWeight": "6.42~6.781",
       "pet": "鸭吉吉"
     },
     {
@@ -1545,7 +1545,7 @@
     },
     {
       "id": 268,
-      "eggDiameter": "0.216-0.308",
+      "eggDiameter": "0.216-0.32",
       "eggWeight": "2.32-4.212",
       "pet": "矿晶虫"
     },
@@ -1767,8 +1767,8 @@
     },
     {
       "id": 305,
-      "eggDiameter": "0.16~0.2",
-      "eggWeight": "4.155~5.497",
+      "eggDiameter": "0.15~0.2",
+      "eggWeight": "4.03~5.497",
       "pet": "棋棋"
     },
     {
@@ -1917,15 +1917,45 @@
     },
     {
       "id": 331,
-      "eggDiameter": "0.2",
-      "eggWeight": "1.848",
-      "pet": "锤头鹮"
-    },
-    {
-      "id": 332,
       "eggDiameter": "0.37",
       "eggWeight": "2.308",
       "pet": "菊花梨"
+    },
+    {
+      "id": 332,
+      "eggDiameter": "0.38",
+      "eggWeight": "6.781",
+      "pet": "鸭吉吉"
+    },
+    {
+      "id": 333,
+      "eggDiameter": "0.32",
+      "eggWeight": "2.485",
+      "pet": "矿晶虫"
+    },
+    {
+      "id": 334,
+      "eggDiameter": "0.25",
+      "eggWeight": "3.324",
+      "pet": "拉特"
+    },
+    {
+      "id": 335,
+      "eggDiameter": "0.46",
+      "eggWeight": "17.98",
+      "pet": "锤头鹳"
+    },
+    {
+      "id": 336,
+      "eggDiameter": "0.52",
+      "eggWeight": "25.909",
+      "pet": "恶魔狼"
+    },
+    {
+      "id": 337,
+      "eggDiameter": "0.15",
+      "eggWeight": "4.03",
+      "pet": "棋棋"
     }
   ]
 }
