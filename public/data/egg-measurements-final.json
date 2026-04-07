@@ -1,5 +1,5 @@
 {
-  "total": 483,
+  "total": 488,
   "items": [
     {
       "id": 1,
@@ -202,7 +202,7 @@
     {
       "id": 35,
       "eggDiameter": "0.25~0.65",
-      "eggWeight": "2.578~6",
+      "eggWeight": "2.572~6",
       "pet": "电咩咩"
     },
     {
@@ -237,8 +237,8 @@
     },
     {
       "id": 41,
-      "eggDiameter": "0.31-0.33",
-      "eggWeight": "19.926-21.456",
+      "eggDiameter": "0.26-0.33",
+      "eggWeight": "17.336-21.456",
       "pet": "嘟嘟煲"
     },
     {
@@ -1641,8 +1641,8 @@
     },
     {
       "id": 285,
-      "eggDiameter": "0.35-0.43",
-      "eggWeight": "7.759-9.4",
+      "eggDiameter": "0.34-0.43",
+      "eggWeight": "7.521-9.4",
       "pet": "白发懒人"
     },
     {
@@ -1767,8 +1767,8 @@
     },
     {
       "id": 306,
-      "eggDiameter": "0.23~0.27",
-      "eggWeight": "2.64~3.21",
+      "eggDiameter": "0.22~0.27",
+      "eggWeight": "2.554~3.21",
       "pet": "小甲虫"
     },
     {
@@ -2898,6 +2898,36 @@
       "eggDiameter": "0.135",
       "eggWeight": "0.03",
       "pet": "蒲公英"
+    },
+    {
+      "id": 495,
+      "eggDiameter": "0.35",
+      "eggWeight": "10.552",
+      "pet": "小星光"
+    },
+    {
+      "id": 496,
+      "eggDiameter": "0.31",
+      "eggWeight": "1.793",
+      "pet": "菊花梨"
+    },
+    {
+      "id": 497,
+      "eggDiameter": "0.31",
+      "eggWeight": "5.241",
+      "pet": "治愈兔"
+    },
+    {
+      "id": 498,
+      "eggDiameter": "0.19",
+      "eggWeight": "5.196",
+      "pet": "柴渣虫"
+    },
+    {
+      "id": 499,
+      "eggDiameter": "0.45",
+      "eggWeight": "16.36",
+      "pet": "小独角兽"
     }
   ]
 }
