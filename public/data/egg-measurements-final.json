@@ -1,5 +1,5 @@
 {
-  "total": 636,
+  "total": 642,
   "items": [
     {
       "id": 1,
@@ -399,8 +399,8 @@
     },
     {
       "id": 70,
-      "eggDiameter": "0.25~0.72",
-      "eggWeight": "2.839~8",
+      "eggDiameter": "0.23~0.72",
+      "eggWeight": "2.589~8",
       "pet": "呼呼猪"
     },
     {
@@ -1467,7 +1467,7 @@
     },
     {
       "id": 256,
-      "eggDiameter": "0.188-0.268",
+      "eggDiameter": "0.188-0.28",
       "eggWeight": "0.84-1.36",
       "pet": "小草虫"
     },
@@ -3816,6 +3816,42 @@
       "eggDiameter": "0.16",
       "eggWeight": "1.729",
       "pet": "兽花蕾"
+    },
+    {
+      "id": 648,
+      "eggDiameter": "0.28",
+      "eggWeight": "1.35",
+      "pet": "小草虫"
+    },
+    {
+      "id": 649,
+      "eggDiameter": "0.29",
+      "eggWeight": "18.389",
+      "pet": "嘟嘟煲"
+    },
+    {
+      "id": 650,
+      "eggDiameter": "0.23",
+      "eggWeight": "2.589",
+      "pet": "呼呼猪"
+    },
+    {
+      "id": 651,
+      "eggDiameter": "0.15",
+      "eggWeight": "1.735",
+      "pet": "号儿鱼"
+    },
+    {
+      "id": 652,
+      "eggDiameter": "0.23",
+      "eggWeight": "1.601",
+      "pet": "优优"
+    },
+    {
+      "id": 653,
+      "eggDiameter": "0.24",
+      "eggWeight": "1.919",
+      "pet": "小夜"
     }
   ]
 }
