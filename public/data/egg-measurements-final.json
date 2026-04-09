@@ -1,5 +1,5 @@
 {
-  "total": 805,
+  "total": 818,
   "totalPets": 211,
   "groups": [
     {
@@ -80,7 +80,7 @@
         {
           "id": 174,
           "eggDiameter": "0.26~0.55",
-          "eggWeight": "5.394~6.781"
+          "eggWeight": "5.319~6.781"
         }
       ],
       "exactItems": [
@@ -88,6 +88,11 @@
           "id": 786,
           "eggDiameter": "0.26",
           "eggWeight": "5.394"
+        },
+        {
+          "id": 825,
+          "eggDiameter": "0.29",
+          "eggWeight": "5.319"
         },
         {
           "id": 430,
@@ -464,6 +469,11 @@
           "id": 608,
           "eggDiameter": "0.17",
           "eggWeight": "1.296"
+        },
+        {
+          "id": 829,
+          "eggDiameter": "0.18",
+          "eggWeight": "1.365"
         },
         {
           "id": 44,
@@ -1136,6 +1146,11 @@
           "eggWeight": "1.737"
         },
         {
+          "id": 832,
+          "eggDiameter": "0.26",
+          "eggWeight": "2.014"
+        },
+        {
           "id": 462,
           "eggDiameter": "0.27",
           "eggWeight": "2.085"
@@ -1407,6 +1422,16 @@
           "id": 581,
           "eggDiameter": "0.27",
           "eggWeight": "1.532"
+        },
+        {
+          "id": 822,
+          "eggDiameter": "0.28",
+          "eggWeight": "1.6"
+        },
+        {
+          "id": 823,
+          "eggDiameter": "0.28",
+          "eggWeight": "1.6"
         },
         {
           "id": 504,
@@ -2546,6 +2571,11 @@
           "eggWeight": "2.839"
         },
         {
+          "id": 827,
+          "eggDiameter": "0.28",
+          "eggWeight": "3.103"
+        },
+        {
           "id": 401,
           "eggDiameter": "0.28",
           "eggWeight": "3.116"
@@ -2907,11 +2937,16 @@
       "rangeItems": [
         {
           "id": 281,
-          "eggDiameter": "0.31-0.35",
-          "eggWeight": "8.146-9"
+          "eggDiameter": "0.27-0.35",
+          "eggWeight": "7.0888-9"
         }
       ],
       "exactItems": [
+        {
+          "id": 821,
+          "eggDiameter": "0.27",
+          "eggWeight": "7.0888"
+        },
         {
           "id": 518,
           "eggDiameter": "0.32",
@@ -3307,6 +3342,11 @@
           "id": 216,
           "eggDiameter": "0.16",
           "eggWeight": "1.894"
+        },
+        {
+          "id": 826,
+          "eggDiameter": "0.16",
+          "eggWeight": "1.931"
         },
         {
           "id": 641,
@@ -4092,6 +4132,11 @@
           "id": 220,
           "eggDiameter": "0.36",
           "eggWeight": "12.772"
+        },
+        {
+          "id": 820,
+          "eggDiameter": "0.42",
+          "eggWeight": "14.675"
         }
       ]
     },
@@ -4114,10 +4159,15 @@
         {
           "id": 627,
           "eggDiameter": "0.28-0.3",
-          "eggWeight": "13.631-16.648"
+          "eggWeight": "13.081-16.648"
         }
       ],
       "exactItems": [
+        {
+          "id": 828,
+          "eggDiameter": "0.28",
+          "eggWeight": "13.081"
+        },
         {
           "id": 734,
           "eggDiameter": "0.28",
@@ -4770,7 +4820,7 @@
       "rangeItems": [
         {
           "id": 244,
-          "eggDiameter": "0.16-0.228",
+          "eggDiameter": "0.16-0.24",
           "eggWeight": "1.3-2.16"
         }
       ],
@@ -4799,6 +4849,11 @@
           "id": 579,
           "eggDiameter": "0.22",
           "eggWeight": "1.82"
+        },
+        {
+          "id": 830,
+          "eggDiameter": "0.24",
+          "eggWeight": "2.081"
         }
       ]
     },
@@ -5022,6 +5077,11 @@
           "id": 560,
           "eggDiameter": "0.4",
           "eggWeight": "11.527"
+        },
+        {
+          "id": 831,
+          "eggDiameter": "0.41",
+          "eggWeight": "11.857"
         },
         {
           "id": 513,
@@ -5381,6 +5441,11 @@
           "id": 475,
           "eggDiameter": "0.23",
           "eggWeight": "0.759"
+        },
+        {
+          "id": 824,
+          "eggDiameter": "0.27",
+          "eggWeight": "0.947"
         },
         {
           "id": 478,
