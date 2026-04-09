@@ -156,6 +156,13 @@ const shinyPetOptions = computed(() => {
   }
   return [...finals].sort((a, b) => a.localeCompare(b, 'zh-CN'))
 })
+const shinyPetOptionSet = computed(() => new Set(shinyPetOptions.value))
+const shinyPetOptionObjects = computed(() =>
+  shinyPetOptions.value.map((name) => ({
+    label: name,
+    value: name
+  }))
+)
 
 function addShinyOwned() {
   const name = (shinyOwnedDraftName.value || '').trim()
@@ -165,7 +172,7 @@ function addShinyOwned() {
   }
 
   const finalName = groupIndex.value.stageToFinal.get(name) || name
-  if (!shinyPetOptions.value.includes(finalName)) {
+  if (!shinyPetOptionSet.value.has(finalName)) {
     ElMessage.warning('仅可添加异色精灵')
     return
   }
@@ -1422,30 +1429,7 @@ async function buildShinyFlowExportSvg() {
 
 
 
-async function downloadShinyFlowSvg() {
-  if (!shinyFlowSvg.value) {
-    ElMessage.warning('暂无可保存的流程图')
-    return
-  }
 
-  try {
-    const brandedSvg = await buildShinyFlowExportSvg()
-    const blob = new Blob([brandedSvg], {
-      type: 'image/svg+xml;charset=utf-8'
-    })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'rocom-shiny-flow.svg'
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
-  } catch (err) {
-    console.error(err)
-    ElMessage.warning('SVG 导出失败，请重试')
-  }
-}
 
 async function downloadShinyFlowPng() {
   if (!shinyFlowSvg.value) {
@@ -2036,9 +2020,15 @@ onBeforeUnmount(() => {
             <div class="grid">
               <el-form-item label="添加已有异色">
                 <div class="owned-add-row">
-                  <el-select v-model="shinyOwnedDraftName" clearable placeholder="选择已有异色精灵" size="large" class="owned-add-select">
-                    <el-option v-for="name in shinyPetOptions" :key="`owned-opt-${name}`" :label="name" :value="name" />
-                  </el-select>
+                  <el-select-v2
+                    v-model="shinyOwnedDraftName"
+                    clearable
+                    placeholder="选择已有异色精灵"
+                    size="large"
+                    class="owned-add-select"
+                    :options="shinyPetOptionObjects"
+                    :height="300"
+                  />
                   <el-radio-group v-model="shinyOwnedDraftGender" size="large" class="owned-gender-group">
                     <el-radio-button label="female" class="owned-gender-female">
                       <span style="display: inline-flex; align-items: center; gap: 6px;">
@@ -2179,7 +2169,7 @@ onBeforeUnmount(() => {
                       <div class="shiny-flow-toolbar">
                         <div></div>
                         <div class="shiny-flow-action-group">
-                          <button type="button" class="shiny-flow-btn shiny-flow-save-btn" @click="downloadShinyFlowPng">保存 PNG</button>
+                          <button type="button" class="shiny-flow-btn shiny-flow-save-btn" @click="downloadShinyFlowPng">保存图片</button>
                         </div>
                       </div>
                       <div class="shiny-flow-wrap shiny-flow-preview-trigger" @click="openShinyFlowPreview">
@@ -2210,7 +2200,7 @@ onBeforeUnmount(() => {
                             <h3 class="group-pet-name">洛克星盘-异色孵化流程图</h3>
                           </div>
                           <div class="shiny-flow-action-group">
-                            <button type="button" class="shiny-flow-btn shiny-flow-save-btn" @click="downloadShinyFlowPng">保存 PNG</button>
+                            <button type="button" class="shiny-flow-btn shiny-flow-save-btn" @click="downloadShinyFlowPng">保存图片</button>
                             <button type="button" class="shiny-flow-btn" @click="closeShinyFlowPreview">关闭</button>
                           </div>
                         </div>
