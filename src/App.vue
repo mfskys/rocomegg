@@ -2,9 +2,6 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Search, Refresh, Sunny, Moon, Monitor } from '@element-plus/icons-vue'
-import html2canvas from 'html2canvas'
-import QRCode from 'qrcode'
-import mermaid from 'mermaid'
 import GenderMaleIcon from './components/icons/GenderMaleIcon.vue'
 import GenderFemaleIcon from './components/icons/GenderFemaleIcon.vue'
 import {
@@ -13,6 +10,40 @@ import {
   NO_BREED_PETS,
   normalizeBreedingName
 } from './data/breeding-config'
+
+let html2canvasLib = null
+let qrcodeLib = null
+let mermaidLib = null
+let mermaidInitialized = false
+
+async function getHtml2canvas() {
+  if (!html2canvasLib) {
+    html2canvasLib = (await import('html2canvas')).default
+  }
+  return html2canvasLib
+}
+
+async function getQRCode() {
+  if (!qrcodeLib) {
+    qrcodeLib = (await import('qrcode')).default
+  }
+  return qrcodeLib
+}
+
+async function getMermaid() {
+  if (!mermaidLib) {
+    mermaidLib = (await import('mermaid')).default
+  }
+  if (!mermaidInitialized) {
+    mermaidLib.initialize({
+      startOnLoad: false,
+      theme: activeTheme.value === 'dark' ? 'dark' : 'default',
+      securityLevel: 'loose'
+    })
+    mermaidInitialized = true
+  }
+  return mermaidLib
+}
 
 const currentMode = ref('size')
 const groupSubMode = ref('group')
@@ -643,6 +674,7 @@ async function onShareLongImage() {
     const footerTextColor = posterIsDark ? '#cbd5e1' : '#4b5563'
     const footerBorderColor = posterIsDark ? '#334155' : '#e5e7eb'
 
+    const html2canvas = await getHtml2canvas()
     const canvas = await html2canvas(target, {
       backgroundColor: posterBg,
       useCORS: true,
@@ -653,6 +685,7 @@ async function onShareLongImage() {
       scrollY: -window.scrollY
     })
 
+    const QRCode = await getQRCode()
     const qrDataUrl = await QRCode.toDataURL(buildShareQueryUrl(), {
       width: 240,
       margin: 1,
@@ -1260,6 +1293,7 @@ async function renderShinyFlowchart(routePlan) {
       return
     }
 
+    const mermaid = await getMermaid()
     const renderId = `shiny-flow-${Date.now()}`
     const { svg } = await mermaid.render(renderId, graphText)
     shinyFlowSvg.value = svg
@@ -1333,6 +1367,7 @@ async function buildShinyFlowExportSvg() {
   const backgroundColor = activeTheme.value === 'dark' ? '#020617' : '#ffffff'
   const footerTitleColor = activeTheme.value === 'dark' ? '#e5e7eb' : '#111827'
   const footerLineColor = activeTheme.value === 'dark' ? '#334155' : '#e5e7eb'
+  const QRCode = await getQRCode()
   const qrDataUrl = await QRCode.toDataURL(getShinyFlowExportUrl(), {
     width: qrSize * 2,
     margin: 1,
@@ -1751,11 +1786,6 @@ function applySharedParamsFromUrl() {
 
 onMounted(async () => {
   initThemeMode()
-  mermaid.initialize({
-    startOnLoad: false,
-    theme: activeTheme.value === 'dark' ? 'dark' : 'default',
-    securityLevel: 'loose'
-  })
   await loadDataset()
   applySharedParamsFromUrl()
 })
