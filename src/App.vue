@@ -45,6 +45,14 @@ async function getMermaid() {
   return mermaidLib
 }
 
+async function preloadHeavyLibraries() {
+  await Promise.all([
+    getHtml2canvas(),
+    getQRCode(),
+    getMermaid()
+  ])
+}
+
 const currentMode = ref('size')
 const groupSubMode = ref('group')
 
@@ -1815,7 +1823,10 @@ function applySharedParamsFromUrl() {
 
 onMounted(async () => {
   initThemeMode()
-  await loadDataset()
+  await Promise.all([
+    loadDataset(),
+    preloadHeavyLibraries()
+  ])
   applySharedParamsFromUrl()
 })
 
