@@ -2033,13 +2033,15 @@ onBeforeUnmount(() => {
                     <el-radio-button label="female" class="owned-gender-female">
                       <span style="display: inline-flex; align-items: center; gap: 6px;">
                         <GenderFemaleIcon />
-                        <span>雌性</span>
+                        <span class="gender-label-full">雌性</span>
+                        <span class="gender-label-short">雌</span>
                       </span>
                     </el-radio-button>
                     <el-radio-button label="male" class="owned-gender-male">
                       <span style="display: inline-flex; align-items: center; gap: 6px;">
                         <GenderMaleIcon />
-                        <span>雄性</span>
+                        <span class="gender-label-full">雄性</span>
+                        <span class="gender-label-short">雄</span>
                       </span>
                     </el-radio-button>
                   </el-radio-group>
@@ -2149,8 +2151,9 @@ onBeforeUnmount(() => {
         <section class="result-card" v-else>
           <div class="result-header">
             <h2>异色路线规划</h2>
-            <el-tag v-if="shinyHasSearched" type="success" effect="light" round>异色父系 {{ shinyCandidates.length }} 个</el-tag>
-            <el-tag v-else type="info" effect="light" round>待查询</el-tag>
+            <div v-if="shinyFlowSvg" class="shiny-flow-action-group">
+              <button type="button" class="shiny-flow-btn shiny-flow-save-btn" @click="downloadShinyFlowPng">保存图片</button>
+            </div>
           </div>
 
           <el-skeleton :loading="shinySearching || loadingData" animated :rows="7">
@@ -2160,18 +2163,7 @@ onBeforeUnmount(() => {
               <div v-else>
                 <article v-if="shinyResult.routePlan" class="result-item group-summary group-summary-card">
                   <div class="left">
-                    <div class="title-row">
-                      <h3>洛克星盘-异色孵化流程图</h3>
-                      <span class="pet-id">完成 {{ shinyResult.routePlan.doneCount }} / {{ shinyResult.routePlan.total }}</span>
-                    </div>
-
                     <div v-if="shinyFlowSvg" class="shiny-flow-card">
-                      <div class="shiny-flow-toolbar">
-                        <div></div>
-                        <div class="shiny-flow-action-group">
-                          <button type="button" class="shiny-flow-btn shiny-flow-save-btn" @click="downloadShinyFlowPng">保存图片</button>
-                        </div>
-                      </div>
                       <div class="shiny-flow-wrap shiny-flow-preview-trigger" @click="openShinyFlowPreview">
                         <div class="shiny-flow-watermark" aria-hidden="true">
                           <span>洛克星盘 · 异色路线规划</span>
@@ -2834,6 +2826,14 @@ onBeforeUnmount(() => {
   .shiny-flow-preview-head {
     justify-content: flex-end;
   }
+
+  .gender-label-full {
+    display: none;
+  }
+
+  .gender-label-short {
+    display: inline;
+  }
 }
 
 .page.theme-dark .shiny-flow-card {
@@ -2917,7 +2917,10 @@ onBeforeUnmount(() => {
 .owned-gender-group :deep(.el-radio-button__inner) {
   min-width: 72px;
   border-radius: 12px;
-  transition: all 0.2s ease;
+}
+
+.gender-label-short {
+  display: none;
 }
 
 .owned-gender-female :deep(.el-radio-button__inner) {
