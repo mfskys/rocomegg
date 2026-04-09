@@ -73,6 +73,29 @@ const sharingCapture = ref(false)
 const shareImageUrl = ref('')
 const shareImagesReady = ref(true)
 
+const OFFICIAL_ACTIVITY_DISMISSED_KEY = 'rocom_official_activity_dismissed'
+const showOfficialActivity = ref(true)
+
+function getTodayActivityDismissKey() {
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = String(now.getMonth() + 1).padStart(2, '0')
+  const day = String(now.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+function restoreOfficialActivityState() {
+  if (typeof window === 'undefined') return
+  const dismissedDate = window.localStorage.getItem(OFFICIAL_ACTIVITY_DISMISSED_KEY)
+  showOfficialActivity.value = dismissedDate !== getTodayActivityDismissKey()
+}
+
+function closeOfficialActivity() {
+  showOfficialActivity.value = false
+  if (typeof window === 'undefined') return
+  window.localStorage.setItem(OFFICIAL_ACTIVITY_DISMISSED_KEY, getTodayActivityDismissKey())
+}
+
 const groupKeyword = ref('')
 const groupStage = ref('')
 const groupSearching = ref(false)
@@ -1823,6 +1846,7 @@ function applySharedParamsFromUrl() {
 
 onMounted(async () => {
   initThemeMode()
+  restoreOfficialActivityState()
   await Promise.all([
     loadDataset(),
     preloadHeavyLibraries()
@@ -1858,6 +1882,24 @@ onBeforeUnmount(() => {
         </button>
       </div>
     </nav>
+
+    <section v-if="showOfficialActivity" class="official-activity-card">
+      <div class="official-activity-accent" aria-hidden="true"></div>
+      <div class="official-activity-head">
+        <div class="official-activity-title-wrap">
+          <span class="official-activity-badge">官方活动</span>
+        </div>
+        <button type="button" class="official-activity-close" @click="closeOfficialActivity" aria-label="关闭官方活动">×</button>
+      </div>
+      <a
+        class="official-activity-link"
+        href="https://www.wegame.com.cn/act/wegame/lkwgsj20260409launch/index.html?wg_ad_from=communitycoverNew"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <span class="official-activity-name">洛克王国世界启动签到领好礼</span>
+      </a>
+    </section>
 
     <section class="mode-switch-card">
       <button type="button" class="mode-switch-btn" :class="{ active: currentMode === 'size' }" @click="setMode('size')">
@@ -2389,6 +2431,127 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
 }
+
+.official-activity-card {
+  position: relative;
+  overflow: hidden;
+  max-width: 980px;
+  margin: 0 auto 14px;
+  padding: 16px 18px 16px 22px;
+  background:
+    linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(14, 165, 233, 0.03)),
+    var(--app-surface-soft);
+  border: 1px solid rgba(59, 130, 246, 0.16);
+  border-radius: 18px;
+  box-shadow: var(--app-shadow);
+}
+
+.official-activity-accent {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  background: linear-gradient(180deg, #3b82f6, #0ea5e9);
+}
+
+.official-activity-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.official-activity-title-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.official-activity-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 46px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: rgba(59, 130, 246, 0.12);
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+
+
+.official-activity-close {
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: #fff;
+  color: #475569;
+  border-radius: 999px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.official-activity-close:hover {
+  border-color: var(--app-primary-soft);
+  color: var(--app-primary);
+  background: var(--app-tag-bg);
+}
+
+.official-activity-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  width: 100%;
+  color: var(--app-primary);
+  text-decoration: none;
+  line-height: 1.6;
+}
+
+.official-activity-name {
+  font-weight: 700;
+}
+
+.official-activity-link:hover .official-activity-name {
+  text-decoration: underline;
+}
+
+.page.theme-dark .official-activity-card {
+  background:
+    linear-gradient(135deg, rgba(59, 130, 246, 0.14), rgba(14, 165, 233, 0.05)),
+    rgba(2, 6, 23, 0.92);
+  border-color: rgba(96, 165, 250, 0.22);
+}
+
+.page.theme-dark .official-activity-badge {
+  background: rgba(96, 165, 250, 0.18);
+  color: #bfdbfe;
+}
+
+.page.theme-dark .official-activity-close {
+  background: rgba(15, 23, 42, 0.92);
+  color: #e2e8f0;
+  border-color: rgba(71, 85, 105, 0.7);
+}
+
+.page.theme-dark .official-activity-close:hover {
+  color: #93c5fd;
+  border-color: rgba(96, 165, 250, 0.7);
+  background: rgba(15, 23, 42, 0.98);
+}
+
+
 
 .theme-toggle-btn {
   display: inline-flex;
