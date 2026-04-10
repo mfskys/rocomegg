@@ -1,9 +1,13 @@
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { ElMessage } from 'element-plus'
-import { Search, Refresh, Sunny, Moon, Monitor } from '@element-plus/icons-vue'
-import GenderMaleIcon from './components/icons/GenderMaleIcon.vue'
-import GenderFemaleIcon from './components/icons/GenderFemaleIcon.vue'
+import { useRoute, useRouter } from 'vue-router'
+import { Search, Refresh, Sunny, Moon, Monitor, House, Bell } from '@element-plus/icons-vue'
+import HomePage from './pages/HomePage.vue'
+import EggSizePage from './pages/EggSizePage.vue'
+import EggGroupPage from './pages/EggGroupPage.vue'
+import EggBreedingPage from './pages/EggBreedingPage.vue'
+import EggShinyPage from './pages/EggShinyPage.vue'
 import {
   EGG_GROUP_INPUT,
   SHINY_SEED_PETS,
@@ -53,8 +57,9 @@ async function preloadHeavyLibraries() {
   ])
 }
 
-const currentMode = ref('size')
-const groupSubMode = ref('group')
+const router = useRouter()
+const route = useRoute()
+const currentPage = computed(() => String(route.name || 'home'))
 
 const loadingData = ref(false)
 const searching = ref(false)
@@ -73,27 +78,25 @@ const sharingCapture = ref(false)
 const shareImageUrl = ref('')
 const shareImagesReady = ref(true)
 
-const OFFICIAL_ACTIVITY_DISMISSED_KEY = 'rocom_official_activity_dismissed'
+const OFFICIAL_ACTIVITY_HIDDEN_KEY = 'rocom_official_activity_hidden'
 const showOfficialActivity = ref(true)
-
-function getTodayActivityDismissKey() {
-  const now = new Date()
-  const year = now.getFullYear()
-  const month = String(now.getMonth() + 1).padStart(2, '0')
-  const day = String(now.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
-}
 
 function restoreOfficialActivityState() {
   if (typeof window === 'undefined') return
-  const dismissedDate = window.localStorage.getItem(OFFICIAL_ACTIVITY_DISMISSED_KEY)
-  showOfficialActivity.value = dismissedDate !== getTodayActivityDismissKey()
+  const hiddenState = window.localStorage.getItem(OFFICIAL_ACTIVITY_HIDDEN_KEY)
+  showOfficialActivity.value = hiddenState !== 'true'
 }
 
 function closeOfficialActivity() {
   showOfficialActivity.value = false
   if (typeof window === 'undefined') return
-  window.localStorage.setItem(OFFICIAL_ACTIVITY_DISMISSED_KEY, getTodayActivityDismissKey())
+  window.localStorage.setItem(OFFICIAL_ACTIVITY_HIDDEN_KEY, 'true')
+}
+
+function openOfficialActivity() {
+  showOfficialActivity.value = true
+  if (typeof window === 'undefined') return
+  window.localStorage.setItem(OFFICIAL_ACTIVITY_HIDDEN_KEY, 'false')
 }
 
 const groupKeyword = ref('')
@@ -142,13 +145,6 @@ const groupStageOptions = computed(() =>
   Object.keys(eggGroupInput).sort((a, b) => a.localeCompare(b, 'zh-CN'))
 )
 const datasetCount = computed(() => rawItems.value.length)
-const groupModeHint = computed(() => {
-  if (groupSubMode.value === 'group') return '可单独查询精灵蛋组或者查询独自的蛋组，互斥'
-  if (groupSubMode.value === 'breed') {
-    return '孵蛋规则：需要同蛋组精灵，并且是一公一母；孵化出来的为母系精灵。父母均为普通精灵时，小概率出现异色/炫彩精灵；父母有异色/炫彩时，蛋出现异色/炫彩概率提高。'
-  }
-  return '添加异色清单，查询会自动引用你已添加的异色清单进行路线规划。'
-})
 
 const THEME_STORAGE_KEY = 'rocom_theme_mode'
 const themeMode = ref('auto')
@@ -209,6 +205,8 @@ function cycleThemeMode() {
 
 const themeModeLabel = computed(() => (themeMode.value === 'light' ? '浅色' : themeMode.value === 'dark' ? '深色' : '自动'))
 const themeIcon = computed(() => (themeMode.value === 'light' ? Sunny : themeMode.value === 'dark' ? Moon : Monitor))
+const showHomeNavButton = computed(() => currentPage.value !== 'home')
+const showOfficialActivityNavButton = computed(() => currentPage.value === 'home' && !showOfficialActivity.value)
 const activeTheme = computed(() => (themeMode.value === 'auto' ? (systemDark.value ? 'dark' : 'light') : themeMode.value))
 const shinyVisualActive = computed(() => forceShiny.value && canEnableShinySwitch())
 const shinyPetOptions = computed(() => {
@@ -264,12 +262,8 @@ function removeShinyOwned(item) {
   shinyOwnedList.value = shinyOwnedList.value.filter((x) => !(x.name === item.name && x.gender === item.gender))
 }
 
-function setMode(mode) {
-  currentMode.value = mode
-}
-
-function setGroupSubMode(mode) {
-  groupSubMode.value = mode
+function navigateTo(page) {
+  router.push({ name: page })
 }
 
 function toNumber(value) {
@@ -1827,7 +1821,7 @@ function applySharedParamsFromUrl() {
   const w = (params.get('w') || '').trim()
   const mode = (params.get('mode') || '').trim()
 
-  if (mode === 'size') currentMode.value = 'size'
+  if (mode === 'size') navigateTo('size')
   if (!d || !w) return
 
   const dNum = Number(d)
@@ -1868,9 +1862,32 @@ onBeforeUnmount(() => {
   <div class="page" :class="{ 'theme-dark': activeTheme === 'dark', 'theme-light': activeTheme === 'light', 'shiny-active': shinyVisualActive }">
     <nav class="top-nav">
       <div class="nav-left">
-        <span class="brand">洛克星盘-洛克王国世界工具站</span>
+        <span class="brand">
+          <span class="brand-short">洛克星盘</span>
+          <span class="brand-full">洛克星盘-洛克王国世界工具站</span>
+        </span>
       </div>
       <div class="nav-right">
+        <button
+          v-if="showOfficialActivityNavButton"
+          class="theme-toggle-btn official-activity-toggle-btn"
+          type="button"
+          title="显示官方活动"
+          aria-label="显示官方活动"
+          @click="openOfficialActivity"
+        >
+          <el-icon><Bell /></el-icon>
+        </button>
+        <button
+          v-if="showHomeNavButton"
+          class="theme-toggle-btn nav-home-btn"
+          type="button"
+          title="返回首页"
+          aria-label="返回首页"
+          @click="navigateTo('home')"
+        >
+          <el-icon><House /></el-icon>
+        </button>
         <button
           class="theme-toggle-btn"
           type="button"
@@ -1883,8 +1900,7 @@ onBeforeUnmount(() => {
       </div>
     </nav>
 
-    <section v-if="showOfficialActivity" class="official-activity-card">
-      <div class="official-activity-accent" aria-hidden="true"></div>
+    <section v-if="showOfficialActivity && currentPage === 'home'" class="official-activity-card">
       <div class="official-activity-head">
         <div class="official-activity-title-wrap">
           <span class="official-activity-badge">官方活动</span>
@@ -1901,465 +1917,122 @@ onBeforeUnmount(() => {
       </a>
     </section>
 
-    <section class="mode-switch-card">
-      <button type="button" class="mode-switch-btn" :class="{ active: currentMode === 'size' }" @click="setMode('size')">
-        精灵蛋尺寸查询
-      </button>
-      <button type="button" class="mode-switch-btn" :class="{ active: currentMode === 'group' }" @click="setMode('group')">
-        精灵蛋蛋组查询
-      </button>
-    </section>
+    <HomePage
+      v-if="currentPage === 'home'"
+      @navigate="navigateTo"
+    />
 
-    <template v-if="currentMode === 'size'">
-      <main class="panel">
-        <section v-if="!sharingCapture" class="search-card">
-          <h3>数据个数：<span style="color: var(--app-primary); font-weight: 800;">{{ datasetCount }}</span></h3>
-          <p class="chain-text">可进行查询精灵蛋数据，同时可进行投稿，洛克王国世界交流企鹅群：1091503815</p>
-        </section>
+    <EggSizePage
+      v-if="currentPage === 'size'"
+      :sharing-capture="sharingCapture"
+      :dataset-count="datasetCount"
+      :shiny-visual-active="shinyVisualActive"
+      :diameter-input="diameterInput"
+      :weight-input="weightInput"
+      :refresh-icon="Refresh"
+      :search-icon="Search"
+      :searching="searching"
+      :loading-data="loadingData"
+      :has-searched="hasSearched"
+      :search-mode="searchMode"
+      :exact-results="exactResults"
+      :candidates="candidates"
+      :sharing-poster="sharingPoster"
+      :share-image-url="shareImageUrl"
+      :share-images-ready="shareImagesReady"
+      :get-creature-image-url="getCreatureImageUrl"
+      @update:diameter-input="diameterInput = $event"
+      @update:weight-input="weightInput = $event"
+      @open-survey="onOpenSurvey"
+      @reset="onReset"
+      @search="onSearch"
+      @share-long-image="onShareLongImage"
+      @update-share-images-ready="updateShareImagesReady"
+    />
 
-        <section class="search-card">
-          <h2>查询条件</h2>
-          <el-form label-position="top" class="search-form" @submit.prevent>
-            <div class="grid">
-              <el-form-item label="蛋尺寸" :class="{ 'shiny-field': shinyVisualActive }">
-                <el-input v-model="diameterInput" type="number" step="0.001" placeholder="例如：0.58" clearable size="large" @keyup.enter="onSearch" />
-              </el-form-item>
-              <el-form-item label="蛋重量" :class="{ 'shiny-field': shinyVisualActive }">
-                <el-input v-model="weightInput" type="number" step="0.001" placeholder="例如：8.6" clearable size="large" @keyup.enter="onSearch" />
-              </el-form-item>
-            </div>
+    <EggGroupPage
+      v-else-if="currentPage === 'group'"
+      :group-keyword="groupKeyword"
+      :group-stage="groupStage"
+      :group-stage-options="groupStageOptions"
+      :group-searching="groupSearching"
+      :loading-data="loadingData"
+      :group-has-searched="groupHasSearched"
+      :group-results="groupResults"
+      @update:group-keyword="groupKeyword = $event"
+      @update:group-stage="groupStage = $event"
+      @reset="onGroupReset"
+      @search="onGroupSearch"
+    />
 
-            <div v-if="!sharingCapture" class="actions">
-              <el-button class="submit-btn" size="large" @click="onOpenSurvey">投稿数据</el-button>
-              <el-button class="reset-btn" size="large" :icon="Refresh" @click="onReset">重置</el-button>
-              <el-button
-                class="query-btn"
-                type="primary"
-                size="large"
-                :icon="Search"
-                :loading="searching || loadingData"
-                @click="onSearch"
-              >
-                立即查询
-              </el-button>
-              <el-button
-                v-if="hasSearched"
-                class="share-btn"
-                size="large"
-                :loading="sharingPoster"
-                :disabled="searching || loadingData || (!shareImageUrl && !shareImagesReady)"
-                @click="onShareLongImage"
-              >
-                {{ shareImageUrl ? '点击下载' : '分享长图' }}
-              </el-button>
-            </div>
-          </el-form>
-        </section>
+    <EggBreedingPage
+      v-else-if="currentPage === 'breeding'"
+      :breed-target-name="breedTargetName"
+      :force-shiny="forceShiny"
+      :breed-searching="breedSearching"
+      :loading-data="loadingData"
+      :breed-has-searched="breedHasSearched"
+      :breed-result="breedResult"
+      :breed-candidates="breedCandidates"
+      :can-enable-shiny-switch="canEnableShinySwitch"
+      :refresh-icon="Refresh"
+      :search-icon="Search"
+      @update:breed-target-name="breedTargetName = $event"
+      @update:force-shiny="forceShiny = $event"
+      @reset="onBreedReset"
+      @search="onBreedSearch"
+    />
 
-        <section class="result-card share-poster-target">
-          <div v-if="sharingCapture" class="share-query-wrap">
-            <div class="sub-head">查询条件</div>
-            <div class="share-query-meta">
-              <p class="share-query-item-line">蛋尺寸：{{ String(diameterInput || '').trim() || '--' }} ｜ 蛋重量：{{ String(weightInput || '').trim() || '--' }}</p>
-            </div>
-          </div>
-          <div v-if="!sharingCapture" class="result-header">
-            <h2>候选精灵</h2>
-            <el-tag v-if="hasSearched && searchMode === 'precise'" type="danger" effect="light" round>精准命中</el-tag>
-            <el-tag v-else-if="hasSearched && searchMode === 'tolerance1'" type="warning" effect="light" round>容差命中（尺寸 ±0.01，重量 ±0.1）</el-tag>
-            <el-tag v-else-if="hasSearched && searchMode === 'tolerance2'" type="warning" effect="light" round>容差命中（尺寸 ±0.02，重量 ±0.2）</el-tag>
-            <el-tag v-else-if="hasSearched && searchMode === 'matched'" type="success" effect="light" round>范围命中</el-tag>
-            <el-tag v-else-if="hasSearched && searchMode === 'nearest'" type="info" effect="light" round>近似候选</el-tag>
-          </div>
-
-          <el-skeleton :loading="loadingData || searching" animated :rows="5">
-            <template #default>
-              <div v-if="!hasSearched" class="empty">请输入蛋尺寸和蛋重量后点击查询</div>
-              <div v-else-if="!exactResults.length && !candidates.length" class="empty">未查询到候选精灵</div>
-
-              <div v-if="exactResults.length" class="exact-block">
-                <div class="sub-head">
-                  {{
-                    searchMode === 'precise'
-                      ? '精准命中'
-                      : searchMode === 'tolerance1'
-                        ? '容差命中（容差：尺寸 ±0.01，重量 ±0.1）'
-                        : '容差命中（容差：尺寸 ±0.02，重量 ±0.2）'
-                  }}
-                </div>
-                <transition-group name="rank" tag="div" class="result-list">
-                  <article v-for="(item, index) in exactResults" :key="`exact-${item.petId}-${index}`" class="result-item exact-item">
-                    <div class="left">
-                      <div class="pet-row">
-                        <div class="pet-avatar" v-if="getCreatureImageUrl(item.petId)">
-                          <img :src="getCreatureImageUrl(item.petId)" :alt="item.pet" loading="lazy" @load="updateShareImagesReady" @error="updateShareImagesReady" />
-                        </div>
-                        <div class="pet-meta">
-                          <div class="title-row">
-                            <h3>{{ index + 1 }}. {{ item.pet }}</h3>
-                            <span class="pet-id">#{{ item.petId }}</span>
-                          </div>
-                          <p>精确尺寸：{{ item.eggDiameter }} m</p>
-                          <p>精确重量：{{ item.eggWeight }} kg</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="right">
-                      <div class="prob">{{ item.probability }}%</div>
-                      <el-progress :percentage="item.probability" :stroke-width="10" :show-text="false" :color="item.color" />
-                    </div>
-                  </article>
-                </transition-group>
-              </div>
-
-              <div v-if="candidates.length" class="other-block">
-                <div class="sub-head">{{ exactResults.length ? '其他候选' : '结果列表' }}</div>
-                <transition-group name="rank" tag="div" class="result-list">
-                  <article v-for="(item, index) in candidates" :key="`${item.petId}-${item.pet}`" class="result-item">
-                    <div class="left">
-                      <div class="pet-row">
-                        <div class="pet-avatar" v-if="getCreatureImageUrl(item.petId)">
-                          <img :src="getCreatureImageUrl(item.petId)" :alt="item.pet" loading="lazy" @load="updateShareImagesReady" @error="updateShareImagesReady" />
-                        </div>
-                        <div class="pet-meta">
-                          <div class="title-row">
-                            <h3>{{ index + 1 }}. {{ item.pet }}</h3>
-                            <span class="pet-id">#{{ item.petId }}</span>
-                          </div>
-                          <p>蛋尺寸范围：{{ item.eggDiameter }} m</p>
-                          <p>蛋重量范围：{{ item.eggWeight }} kg</p>
-                          <p v-if="item.matchCount > 1" class="meta">命中记录：{{ item.matchCount }} 条</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="right">
-                      <div class="prob">{{ item.probability }}%</div>
-                      <el-progress :percentage="item.probability" :stroke-width="10" :show-text="false" :color="item.color" />
-                    </div>
-                  </article>
-                </transition-group>
-              </div>
-            </template>
-          </el-skeleton>
-        </section>
-
-
-      </main>
-    </template>
-
-    <template v-else>
-      <main class="panel">
-        <section class="search-card">
-          <div class="title-row">
-            <h3>模式说明</h3>
-          </div>
-          <p class="chain-text">{{ groupModeHint }}</p>
-        </section>
-
-        <section class="search-card">
-          <h2>查询模式</h2>
-          <section class="inner-switch-card">
-            <button type="button" class="inner-switch-btn" :class="{ active: groupSubMode === 'group' }" @click="setGroupSubMode('group')">
-              蛋组查询
-            </button>
-            <button type="button" class="inner-switch-btn" :class="{ active: groupSubMode === 'breed' }" @click="setGroupSubMode('breed')">
-              繁殖查询
-            </button>
-            <button type="button" class="inner-switch-btn" :class="{ active: groupSubMode === 'shiny' }" @click="setGroupSubMode('shiny')">
-              异色孵化
-            </button>
-          </section>
-
-
-
-          <el-form v-if="groupSubMode === 'group'" label-position="top" class="search-form" @submit.prevent>
-            <div class="grid">
-              <el-form-item label="精灵名称">
-                <el-input
-                  v-model="groupKeyword"
-                  placeholder="请输入精灵名称"
-                  clearable
-                  size="large"
-                  :disabled="!!groupStage"
-                />
-              </el-form-item>
-              <el-form-item label="蛋组">
-                <el-select
-                  v-model="groupStage"
-                  placeholder="请选择蛋组"
-                  clearable
-
-                  size="large"
-                  :disabled="!!groupKeyword"
-                >
-                  <el-option v-for="group in groupStageOptions" :key="group" :label="group" :value="group" />
-                </el-select>
-              </el-form-item>
-            </div>
-            <div class="actions">
-              <el-button class="reset-btn" size="large" :icon="Refresh" @click="onGroupReset">重置</el-button>
-              <el-button class="query-btn" type="primary" size="large" :icon="Search" :loading="groupSearching || loadingData" @click="onGroupSearch">
-                立即查询
-              </el-button>
-            </div>
-          </el-form>
-
-          <el-form v-else-if="groupSubMode === 'breed'" label-position="top" class="search-form" @submit.prevent>
-            <div class="grid">
-              <el-form-item label="目标精灵（母系）">
-                <el-input v-model="breedTargetName" placeholder="例如：魔力猫、火神、书魔虫" clearable size="large" @keyup.enter="onBreedSearch" />
-              </el-form-item>
-              <el-form-item label="指定异色">
-                <div class="switch-row">
-                  <el-switch
-                    v-model="forceShiny"
-                    :disabled="!canEnableShinySwitch()"
-                    active-text="只看异色父系"
-                    inactive-text="全部父系"
-                  />
-                </div>
-              </el-form-item>
-            </div>
-            <div class="actions">
-              <el-button class="reset-btn" size="large" :icon="Refresh" @click="onBreedReset">重置</el-button>
-              <el-button class="query-btn" type="primary" size="large" :icon="Search" :loading="breedSearching || loadingData" @click="onBreedSearch">
-                查询繁殖方案
-              </el-button>
-            </div>
-          </el-form>
-
-          <el-form v-else label-position="top" class="search-form" @submit.prevent>
-            <div class="grid">
-              <el-form-item label="添加已有异色">
-                <div class="owned-add-row">
-                  <el-select-v2
-                    v-model="shinyOwnedDraftName"
-                    clearable
-                    placeholder="选择已有异色精灵"
-                    size="large"
-                    class="owned-add-select"
-                    :options="shinyPetOptionObjects"
-                    :height="300"
-                  />
-                  <el-radio-group v-model="shinyOwnedDraftGender" size="large" class="owned-gender-group">
-                    <el-radio-button label="female" class="owned-gender-female">
-                      <span style="display: inline-flex; align-items: center; gap: 6px;">
-                        <GenderFemaleIcon />
-                        <span class="gender-label-full">雌性</span>
-                        <span class="gender-label-short">雌</span>
-                      </span>
-                    </el-radio-button>
-                    <el-radio-button label="male" class="owned-gender-male">
-                      <span style="display: inline-flex; align-items: center; gap: 6px;">
-                        <GenderMaleIcon />
-                        <span class="gender-label-full">雄性</span>
-                        <span class="gender-label-short">雄</span>
-                      </span>
-                    </el-radio-button>
-                  </el-radio-group>
-                  <el-button class="query-btn owned-add-btn" type="primary" size="large" @click="addShinyOwned">+</el-button>
-                </div>
-                <div v-if="shinyOwnedList.length" class="group-tags">
-                  <el-tag
-                    v-for="item in shinyOwnedList"
-                    :key="`owned-${item.name}-${item.gender}`"
-                    :class="item.gender === 'female' ? 'owned-tag-female' : 'owned-tag-male'"
-                    closable
-                    effect="light"
-                    @close="removeShinyOwned(item)"
-                  >
-                    <span style="display: inline-flex; align-items: center; gap: 6px;">
-                      <GenderFemaleIcon v-if="item.gender === 'female'" />
-                      <GenderMaleIcon v-else />
-                      <span>{{ item.name }}</span>
-                    </span>
-                  </el-tag>
-                </div>
-              </el-form-item>
-            </div>
-            <div class="actions">
-              <el-button class="reset-btn" size="large" :icon="Refresh" @click="onShinyReset">重置</el-button>
-              <el-button class="query-btn" type="primary" size="large" :icon="Search" :loading="shinySearching || loadingData" @click="onShinySearch">
-                查询异色孵化
-              </el-button>
-            </div>
-          </el-form>
-        </section>
-
-        <section class="result-card" v-if="groupSubMode === 'group'">
-          <div class="result-header">
-            <h2>蛋组查询结果</h2>
-            <el-tag v-if="groupHasSearched" type="success" effect="light" round>匹配 {{ groupResults.length }} 条</el-tag>
-            <el-tag v-else type="info" effect="light" round>待查询</el-tag>
-          </div>
-
-          <el-skeleton :loading="groupSearching || loadingData" animated :rows="6">
-            <template #default>
-              <div v-if="!groupHasSearched" class="empty">请输入精灵名称或选择蛋组后点击查询</div>
-              <div v-else-if="!groupResults.length" class="empty">未查询到匹配结果</div>
-
-              <transition-group v-else name="rank" tag="div" class="group-result-list">
-                <article v-for="item in groupResults" :key="item.pet" class="result-item group-item">
-                  <div class="left">
-                    <div class="title-row">
-                      <h3 class="group-pet-name">{{ item.pet }}</h3>
-                      <span class="pet-id">蛋组 {{ item.groups.length }} 个</span>
-                    </div>
-                    <p class="chain-text">{{ item.chain }}</p>
-                    <div class="group-tags">
-                      <el-tag v-for="group in item.groups" :key="`${item.pet}-${group}`" effect="light" round>{{ group }}</el-tag>
-                    </div>
-                  </div>
-                </article>
-              </transition-group>
-            </template>
-          </el-skeleton>
-        </section>
-
-        <section class="result-card" v-else-if="groupSubMode === 'breed'">
-          <div class="result-header">
-            <h2>繁殖匹配结果</h2>
-            <el-tag v-if="breedHasSearched" type="success" effect="light" round>父系候选 {{ breedCandidates.length }} 个</el-tag>
-            <el-tag v-else type="info" effect="light" round>待查询</el-tag>
-          </div>
-
-          <el-skeleton :loading="breedSearching || loadingData" animated :rows="7">
-            <template #default>
-              <div v-if="!breedHasSearched" class="empty">输入目标精灵后，展示母系蛋组、进化链与父系候选</div>
-              <div v-else-if="!breedResult" class="empty">未找到目标精灵</div>
-              <div v-else>
-                <article class="result-item group-summary group-summary-card">
-                  <div class="left">
-                    <div class="title-row">
-                      <h3>母系精灵：{{ breedResult.motherPet }}</h3>
-                      <span class="pet-id">孵化蛋：{{ breedResult.eggName }}</span>
-                    </div>
-                    <p>{{ breedResult.chain.join(' → ') }}</p>
-                    <p v-if="breedResult.blocked" class="blocked-tip">该精灵不可孵蛋</p>
-                  </div>
-                </article>
-
-                <div v-if="!breedCandidates.length" class="empty">没有可匹配的父系候选</div>
-
-                <transition-group v-else name="rank" tag="div" class="group-result-list">
-                  <article v-for="item in breedCandidates" :key="item.fatherPet" class="result-item group-item">
-                    <div class="left">
-                      <div class="title-row">
-                        <h3 class="group-pet-name">{{ item.fatherPet }}</h3>
-                        <span class="pet-id">{{ item.isSameChain ? '同进化链' : '可配对' }}</span>
-                      </div>
-                      <p class="chain-text">{{ item.fatherChain }}</p>
-                      <div class="group-tags">
-                        <el-tag v-for="group in item.fatherAllGroups" :key="`${item.fatherPet}-${group}`" effect="light" round>{{ group }}</el-tag>
-                      </div>
-                    </div>
-                  </article>
-                </transition-group>
-              </div>
-            </template>
-          </el-skeleton>
-        </section>
-
-        <section class="result-card" v-else>
-          <div class="result-header">
-            <h2>异色路线规划</h2>
-            <div v-if="shinyFlowSvg" class="shiny-flow-action-group">
-              <button type="button" class="shiny-flow-btn shiny-flow-save-btn" @click="downloadShinyFlowPng">保存图片</button>
-            </div>
-          </div>
-
-          <el-skeleton :loading="shinySearching || loadingData" animated :rows="7">
-            <template #default>
-              <div v-if="!shinyHasSearched" class="empty">添加已有异色后点击查询，系统将规划全异色收集路线</div>
-              <div v-else-if="!shinyResult" class="empty">暂无可规划数据</div>
-              <div v-else>
-                <article v-if="shinyResult.routePlan" class="result-item group-summary group-summary-card">
-                  <div class="left">
-                    <div v-if="shinyFlowSvg" class="shiny-flow-card">
-                      <div class="shiny-flow-wrap shiny-flow-preview-trigger" @click="openShinyFlowPreview">
-                        <div class="shiny-flow-watermark" aria-hidden="true">
-                          <span>洛克星盘 · 异色路线规划</span>
-                          <span>洛克星盘 · 异色路线规划</span>
-                          <span>洛克星盘 · 异色路线规划</span>
-                          <span>洛克星盘 · 异色路线规划</span>
-                          <span>洛克星盘 · 异色路线规划</span>
-                          <span>洛克星盘 · 异色路线规划</span>
-                          <span>洛克星盘 · 异色路线规划</span>
-                          <span>洛克星盘 · 异色路线规划</span>
-                        </div>
-                        <div class="shiny-flow-canvas" v-html="shinyFlowSvg"></div>
-                      </div>
-                    </div>
-
-                    <el-dialog
-                      v-model="shinyFlowPreviewVisible"
-                      fullscreen
-                      append-to-body
-                      class="shiny-flow-preview-dialog"
-                      :show-close="false"
-                    >
-                      <template #header>
-                        <div class="shiny-flow-preview-head">
-                          <div class="shiny-flow-preview-title">
-                            <h3 class="group-pet-name">洛克星盘-异色孵化流程图</h3>
-                          </div>
-                          <div class="shiny-flow-action-group">
-                            <button type="button" class="shiny-flow-btn shiny-flow-save-btn" @click="downloadShinyFlowPng">保存图片</button>
-                            <button type="button" class="shiny-flow-btn" @click="closeShinyFlowPreview">关闭</button>
-                          </div>
-                        </div>
-                      </template>
-                      <div class="shiny-flow-preview-body">
-                        <div class="shiny-flow-wrap shiny-flow-wrap-preview">
-                          <div class="shiny-flow-watermark" aria-hidden="true">
-                            <span>洛克星盘 · 异色路线规划</span>
-                            <span>洛克星盘 · 异色路线规划</span>
-                            <span>洛克星盘 · 异色路线规划</span>
-                            <span>洛克星盘 · 异色路线规划</span>
-                            <span>洛克星盘 · 异色路线规划</span>
-                            <span>洛克星盘 · 异色路线规划</span>
-                            <span>洛克星盘 · 异色路线规划</span>
-                            <span>洛克星盘 · 异色路线规划</span>
-                          </div>
-                          <div class="shiny-flow-canvas" v-html="shinyFlowSvg"></div>
-                        </div>
-                      </div>
-                    </el-dialog>
-
-
-                  </div>
-                </article>
-
-                <div v-if="!shinyCandidates.length" class="empty">没有可匹配的异色父系候选</div>
-
-                <transition-group v-else name="rank" tag="div" class="group-result-list">
-                  <article v-for="item in shinyCandidates" :key="item.fatherPet" class="result-item group-item">
-                    <div class="left">
-                      <div class="title-row">
-                        <h3 class="group-pet-name">{{ item.fatherPet }}</h3>
-                        <span class="pet-id">{{ item.canGet ? '可获取（可孵化）' : '不可获取（当前条件）' }}</span>
-                      </div>
-                      <p class="chain-text">{{ item.fatherChain }}</p>
-                      <div class="group-tags">
-                        <el-tag v-for="group in item.fatherAllGroups" :key="`${item.fatherPet}-${group}`" effect="light" round>{{ group }}</el-tag>
-                      </div>
-                    </div>
-                  </article>
-                </transition-group>
-              </div>
-            </template>
-          </el-skeleton>
-        </section>
-      </main>
-    </template>
+    <EggShinyPage
+      v-else-if="currentPage === 'shiny'"
+      :loading-data="loadingData"
+      :shiny-searching="shinySearching"
+      :shiny-has-searched="shinyHasSearched"
+      :shiny-result="shinyResult"
+      :shiny-candidates="shinyCandidates"
+      :shiny-flow-svg="shinyFlowSvg"
+      :shiny-flow-preview-visible="shinyFlowPreviewVisible"
+      :shiny-owned-draft-name="shinyOwnedDraftName"
+      :shiny-owned-draft-gender="shinyOwnedDraftGender"
+      :shiny-owned-list="shinyOwnedList"
+      :shiny-pet-option-objects="shinyPetOptionObjects"
+      :current-page-title="'精灵蛋异色孵化'"
+      :group-mode-hint="'添加异色清单，查询会自动引用你已添加的异色清单进行路线规划。'"
+      :search-icon="Search"
+      :refresh-icon="Refresh"
+      @update:shiny-owned-draft-name="shinyOwnedDraftName = $event"
+      @update:shiny-owned-draft-gender="shinyOwnedDraftGender = $event"
+      @update:shiny-flow-preview-visible="shinyFlowPreviewVisible = $event"
+      @add-shiny-owned="addShinyOwned"
+      @remove-shiny-owned="removeShinyOwned"
+      @reset="onShinyReset"
+      @search="onShinySearch"
+      @download-flow="downloadShinyFlowPng"
+      @open-preview="openShinyFlowPreview"
+      @close-preview="closeShinyFlowPreview"
+    />
 
     <footer class="site-footer">
       <span>© 2026 洛克星盘</span>
-      <a class="footer-github-link" href="https://github.com/mfskys/rocomegg" target="_blank" rel="noopener noreferrer">
-        <svg class="footer-github-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+      <a class="footer-link footer-github-link" href="https://github.com/mfskys/rocomegg" target="_blank" rel="noopener noreferrer">
+        <svg class="footer-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
           <path fill="currentColor" d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5c.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34c-.46-1.16-1.11-1.47-1.11-1.47c-.91-.62.07-.6.07-.6c1 .07 1.53 1.03 1.53 1.03c.87 1.52 2.34 1.07 2.91.83c.09-.65.35-1.09.63-1.34c-2.22-.25-4.55-1.11-4.55-4.92c0-1.11.38-2 1.03-2.71c-.1-.25-.45-1.29.1-2.64c0 0 .84-.27 2.75 1.02c.79-.22 1.65-.33 2.5-.33s1.71.11 2.5.33c1.91-1.29 2.75-1.02 2.75-1.02c.55 1.35.2 2.39.1 2.64c.65.71 1.03 1.6 1.03 2.71c0 3.82-2.34 4.66-4.57 4.91c.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2"/>
         </svg>
         <span>项目主页</span>
+      </a>
+      <a
+        class="footer-link footer-qq-link"
+        href="https://qun.qq.com/universal-share/share?ac=1&authKey=g4C6V0n27jTeN4KpzuWKLr4zqWLtplm0jG9SebOJGl%2Bzs6zIXAEYtLE73V0dGQ6m&busi_data=eyJncm91cENvZGUiOiIxMDkxNTAzODE1IiwidG9rZW4iOiJZRlV6YXJmZmY0YXAraUNmZlR0R1hPTmIybW4xcFdreVVJUlZWQlYzdCs5cS9hQWZubGJ3RHdKVmxyWi9aclJoIiwidWluIjoiMTUwNzE5NDIwMyJ9&data=JTsiW6bq9rUG_Pk9SNgZv-7qgIoAL63OyUQry6BwdhMZJ4WyqUCvt1cn0WwvPXfMF7QrLq31bqIAZDplm5WpEw&svctype=4&tempid=h5_group_info"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <svg class="footer-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+          <g fill="none">
+            <path d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"/>
+            <path fill="currentColor" d="M12 2a6.285 6.285 0 0 0-6.276 5.937l-.146 2.63a28 28 0 0 0-.615 1.41c-1.24 3.073-1.728 5.773-1.088 6.032c.335.135.913-.426 1.566-1.432a6.67 6.67 0 0 0 1.968 3.593c-1.027.35-1.91.828-1.91 1.33c0 .509 2.48.503 4.239.5h.001c.549-.002 1.01-.008 1.38-.057a6.7 6.7 0 0 0 1.76 0c.37.05.833.055 1.382.056c1.76.004 4.239.01 4.239-.499c0-.502-.883-.979-1.909-1.33a6.67 6.67 0 0 0 1.967-3.586c.65 1.002 1.227 1.56 1.56 1.425c.64-.259.154-2.96-1.088-6.032a28 28 0 0 0-.607-1.395l-.147-2.645A6.285 6.285 0 0 0 12 2"/>
+          </g>
+        </svg>
+        <span>官方Q群</span>
       </a>
     </footer>
   </div>
@@ -2373,7 +2046,10 @@ onBeforeUnmount(() => {
   --app-border: rgba(148, 188, 225, 0.55);
   --app-shadow: rgba(63, 131, 189, 0.12);
 
-  --app-bg: radial-gradient(circle at top left, #f7fbff, #edf5ff 58%, #e4f0ff);
+  --app-bg:
+    linear-gradient(rgba(247, 251, 255, 0.78), rgba(237, 245, 255, 0.82)),
+    url('/周年庆贺图.png') center / cover fixed no-repeat,
+    radial-gradient(circle at top left, #f7fbff, #edf5ff 58%, #e4f0ff);
   --app-surface: rgba(255, 255, 255, 0.94);
   --app-surface-soft: rgba(255, 255, 255, 0.9);
   --app-item-bg: #ffffff;
@@ -2396,7 +2072,10 @@ onBeforeUnmount(() => {
   --app-border: rgba(96, 165, 250, 0.4);
   --app-shadow: rgba(2, 6, 23, 0.55);
 
-  --app-bg: radial-gradient(circle at top left, #020617, #0b1220 55%, #111827);
+  --app-bg:
+    linear-gradient(rgba(2, 6, 23, 0.72), rgba(11, 18, 32, 0.82)),
+    url('/周年庆贺图.png') center / cover fixed no-repeat,
+    radial-gradient(circle at top left, #020617, #0b1220 55%, #111827);
   --app-surface: #0b1220;
   --app-surface-soft: #0f172a;
   --app-item-bg: #111827;
@@ -2409,13 +2088,17 @@ onBeforeUnmount(() => {
 }
 
 .top-nav {
-  max-width: 980px;
+  max-width: 1180px;
   margin: 0 auto 14px;
   padding: 10px 12px;
-  border-radius: 22px;
-  background: var(--app-surface);
-  border: 1px solid var(--app-border);
-  box-shadow: 0 10px 24px var(--app-shadow);
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.08));
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 14px 30px rgba(15, 23, 42, 0.14);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -2427,32 +2110,55 @@ onBeforeUnmount(() => {
   letter-spacing: 0.3px;
 }
 
+.brand-short {
+  display: none;
+}
+
+.brand-full {
+  display: inline;
+}
+
 .nav-right {
   display: flex;
   align-items: center;
+  gap: 10px;
+}
+
+.nav-home-btn,
+.official-activity-toggle-btn {
+  color: var(--app-primary);
 }
 
 .official-activity-card {
   position: relative;
   overflow: hidden;
-  max-width: 980px;
+  max-width: 1180px;
   margin: 0 auto 14px;
-  padding: 16px 18px 16px 22px;
-  background:
-    linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(14, 165, 233, 0.03)),
-    var(--app-surface-soft);
-  border: 1px solid rgba(59, 130, 246, 0.16);
-  border-radius: 18px;
-  box-shadow: var(--app-shadow);
+  padding: 28px 22px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.08));
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 24px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 14px 30px rgba(15, 23, 42, 0.14);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
 }
 
-.official-activity-accent {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 6px;
-  background: linear-gradient(180deg, #3b82f6, #0ea5e9);
+.official-activity-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 46px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--app-primary);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  border: 1px solid rgba(255, 255, 255, 0.24);
 }
 
 .official-activity-head {
@@ -2470,42 +2176,38 @@ onBeforeUnmount(() => {
   min-width: 0;
 }
 
-.official-activity-badge {
+.official-activity-close {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 46px;
-  height: 24px;
-  padding: 0 8px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.14));
+  color: var(--app-primary);
   border-radius: 999px;
-  background: rgba(59, 130, 246, 0.12);
-  color: #2563eb;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-}
-
-
-
-.official-activity-close {
-  border: 1px solid rgba(148, 163, 184, 0.35);
-  background: #fff;
-  color: #475569;
-  border-radius: 999px;
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   padding: 0;
   font-size: 18px;
   font-weight: 700;
   line-height: 1;
   cursor: pointer;
-  transition: all 0.2s ease;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.24),
+    0 10px 20px rgba(15, 23, 42, 0.12);
+  backdrop-filter: blur(14px) saturate(150%);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
 
+
+
 .official-activity-close:hover {
-  border-color: var(--app-primary-soft);
-  color: var(--app-primary);
-  background: var(--app-tag-bg);
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 14px 24px rgba(15, 23, 42, 0.14);
+  border-color: rgba(255, 255, 255, 0.34);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.18));
 }
 
 .official-activity-link {
@@ -2514,42 +2216,63 @@ onBeforeUnmount(() => {
   justify-content: space-between;
   gap: 14px;
   width: 100%;
-  color: var(--app-primary);
+  color: var(--app-text);
   text-decoration: none;
   line-height: 1.6;
 }
 
 .official-activity-name {
   font-weight: 700;
+  color: var(--app-text);
+}
+
+.page.theme-dark .top-nav {
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  box-shadow:
+    0 18px 36px rgba(2, 6, 23, 0.38),
+    inset 0 1px 0 rgba(148, 163, 184, 0.1);
+}
+
+.page.theme-dark .official-activity-card {
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  box-shadow:
+    0 18px 36px rgba(2, 6, 23, 0.38),
+    inset 0 1px 0 rgba(148, 163, 184, 0.1);
 }
 
 .official-activity-link:hover .official-activity-name {
   text-decoration: underline;
 }
 
-.page.theme-dark .official-activity-card {
-  background:
-    linear-gradient(135deg, rgba(59, 130, 246, 0.14), rgba(14, 165, 233, 0.05)),
-    rgba(2, 6, 23, 0.92);
-  border-color: rgba(96, 165, 250, 0.22);
-}
-
 .page.theme-dark .official-activity-badge {
-  background: rgba(96, 165, 250, 0.18);
-  color: #bfdbfe;
+  background: linear-gradient(180deg, rgba(30, 41, 59, 0.84), rgba(15, 23, 42, 0.72));
+  color: #93c5fd;
+  border-color: rgba(96, 165, 250, 0.28);
 }
 
 .page.theme-dark .official-activity-close {
-  background: rgba(15, 23, 42, 0.92);
-  color: #e2e8f0;
-  border-color: rgba(71, 85, 105, 0.7);
+  border-color: rgba(96, 165, 250, 0.22);
+  background: linear-gradient(180deg, rgba(30, 41, 59, 0.84), rgba(15, 23, 42, 0.72));
+  color: #bfdbfe;
+  box-shadow:
+    inset 0 1px 0 rgba(148, 163, 184, 0.12),
+    0 10px 20px rgba(2, 6, 23, 0.24);
 }
 
 .page.theme-dark .official-activity-close:hover {
-  color: #93c5fd;
-  border-color: rgba(96, 165, 250, 0.7);
-  background: rgba(15, 23, 42, 0.98);
+  border-color: rgba(96, 165, 250, 0.36);
+  background: linear-gradient(180deg, rgba(30, 41, 59, 0.96), rgba(15, 23, 42, 0.84));
+  box-shadow:
+    inset 0 1px 0 rgba(148, 163, 184, 0.14),
+    0 14px 24px rgba(2, 6, 23, 0.28);
 }
+
+.page.theme-dark .official-activity-link,
+.page.theme-dark .official-activity-name {
+  color: #e5eefb;
+}
+
+
 
 
 
@@ -2557,20 +2280,28 @@ onBeforeUnmount(() => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--app-tag-border);
-  background: var(--app-item-bg);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.14));
   color: var(--app-primary);
   border-radius: 999px;
   width: 34px;
   height: 34px;
   padding: 0;
   cursor: pointer;
-  transition: all 0.2s ease;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.24),
+    0 10px 20px rgba(15, 23, 42, 0.12);
+  backdrop-filter: blur(14px) saturate(150%);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
 
 .theme-toggle-btn:hover {
-  border-color: var(--app-primary-soft);
-  background: var(--app-tag-bg);
+  border-color: rgba(255, 255, 255, 0.34);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.18));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 14px 24px rgba(15, 23, 42, 0.14);
   transform: translateY(-1px);
 }
 
@@ -2579,704 +2310,34 @@ onBeforeUnmount(() => {
   height: 18px;
 }
 
-.mode-switch-card {
-  max-width: 980px;
-  margin: 0 auto 14px;
-  padding: 10px;
-  border-radius: 22px;
-  background: var(--app-surface);
-  border: 1px solid var(--app-border);
-  box-shadow: 0 10px 24px var(--app-shadow);
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
+.page.theme-dark .top-nav {
+  border-color: rgba(148, 163, 184, 0.16);
+  box-shadow:
+    0 18px 36px rgba(2, 6, 23, 0.38),
+    inset 0 1px 0 rgba(148, 163, 184, 0.1);
 }
 
-.mode-switch-btn {
-  width: 100%;
-  border: 1px solid var(--app-tag-border);
-  background: var(--app-item-bg);
-  color: var(--app-primary);
-  font-weight: 700;
-  border-radius: 14px;
-  min-height: 44px;
-  padding: 10px 10px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 14px;
-  line-height: 1.2;
+.page.theme-dark .theme-toggle-btn {
+  border-color: rgba(96, 165, 250, 0.22);
+  background: linear-gradient(180deg, rgba(30, 41, 59, 0.84), rgba(15, 23, 42, 0.72));
+  color: #bfdbfe;
+  box-shadow:
+    inset 0 1px 0 rgba(148, 163, 184, 0.12),
+    0 10px 20px rgba(2, 6, 23, 0.22);
 }
 
-.mode-switch-btn:hover {
-  border-color: #93c5fd;
-  transform: translateY(-1px);
+.page.theme-dark .theme-toggle-btn:hover {
+  border-color: rgba(96, 165, 250, 0.36);
+  background: linear-gradient(180deg, rgba(30, 41, 59, 0.96), rgba(15, 23, 42, 0.84));
 }
 
-.mode-switch-btn.active {
-  background: linear-gradient(135deg, var(--app-primary), var(--app-primary-soft));
-  border-color: transparent;
-  color: #fff;
-  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.22);
-}
-
-.inner-switch-card {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  margin-bottom: 14px;
-}
-
-.inner-switch-btn {
-  width: 100%;
-  border: 1px solid var(--app-tag-border);
-  background: var(--app-item-bg);
-  color: var(--app-primary);
-  font-weight: 700;
-  border-radius: 12px;
-  min-height: 40px;
-  padding: 8px 10px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.inner-switch-btn.active {
-  background: var(--app-tag-bg);
-  border-color: var(--app-primary-soft);
-}
-
-.panel {
-  max-width: 980px;
-  margin: 0 auto;
-  display: grid;
-  gap: 16px;
-}
-
-.search-card,
-.result-card {
-  background: var(--app-surface-soft);
-  border-radius: 22px;
-  padding: 20px;
-  box-shadow: 0 18px 36px rgba(37, 99, 235, 0.08);
-  border: 1px solid rgba(147, 197, 253, 0.45);
-  backdrop-filter: blur(8px);
-}
-
-.search-card h2,
-.result-card h2 {
-  margin: 0 0 12px;
-  color: var(--app-primary);
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-}
-
-.actions {
-  display: flex;
-  gap: 10px;
-  flex-direction: column;
-  width: 100%;
-}
-
-.actions :deep(.el-button) {
-  min-width: 120px;
-  flex: 1 1 100%;
-  width: 100%;
-}
-
-.actions :deep(.el-button + .el-button) {
-  margin-left: 0 !important;
-}
-
-.query-btn {
-  border-radius: 999px !important;
-  border: none !important;
-  padding: 12px 28px !important;
-  background: linear-gradient(135deg, var(--app-primary), var(--app-primary-soft)) !important;
-  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.22);
-}
-
-.reset-btn {
-  border-radius: 999px !important;
-  border: none !important;
-  padding: 12px 26px !important;
-  background: #eff6ff !important;
-  color: var(--app-primary) !important;
-}
-
-.submit-btn {
-  border-radius: 999px !important;
-  border: 1px solid #bfdbfe !important;
-  padding: 12px 26px !important;
-  background: #ffffff !important;
-  color: var(--app-primary) !important;
-}
-
-.share-btn {
-  border-radius: 999px !important;
-  border: 1px dashed var(--app-primary-soft) !important;
-  padding: 12px 26px !important;
-  background: var(--app-tag-bg) !important;
-  color: var(--app-primary) !important;
-}
-
-
-
-.result-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-  gap: 10px;
-}
-
-.share-query-wrap {
-  margin-bottom: 10px;
-}
-
-.share-query-meta {
-  padding: 10px 12px;
-  border-radius: 12px;
-  background: var(--app-item-bg);
-  border: 1px dashed var(--app-tag-border);
-}
-
-.share-query-item-line {
-  margin: 0;
-  font-size: 14px;
-  color: var(--app-text-soft);
-  font-weight: 700;
-}
-
-.empty {
-  text-align: center;
-  color: #6a6880;
-  padding: 28px 10px;
-}
-
-.sub-head {
-  font-weight: 700;
-  color: var(--app-primary);
-  margin: 8px 2px 10px;
-}
-
-.other-block {
-  margin-top: 12px;
-}
-
-.group-result-list {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 10px;
-}
-
-.result-list {
-  display: grid;
-  gap: 12px;
-}
-
-.result-item {
-  border-radius: 16px;
-  background: var(--app-item-bg);
-  border: 1px solid rgba(148, 188, 225, 0.32);
-  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.06);
-  padding: 14px;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-}
-
-.exact-item {
-  border: 1px solid rgba(245, 108, 108, 0.35);
-  background: linear-gradient(180deg, #fff, #fff9f9);
-}
-
-.group-summary {
-  border: 1px solid rgba(37, 99, 235, 0.2);
-  background: var(--app-item-bg-soft);
-}
-
-.group-summary-card {
-  margin-bottom: 12px;
-}
-
-.group-item {
-  grid-template-columns: 1fr;
-}
-
-.group-pet-name {
-  margin: 0 !important;
-}
-
-.pet-row {
-  display: grid;
-  grid-template-columns: 64px 1fr;
-  gap: 12px;
-  align-items: center;
-}
-
-.pet-avatar {
-  width: 64px;
-  height: 64px;
-  border-radius: 12px;
-  border: 1px solid rgba(148, 188, 225, 0.38);
-  background: #fff;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.pet-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.pet-meta {
-  min-width: 0;
-}
-
-.group-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.title-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.left h3 {
-  margin: 0 0 8px;
-  color: #1a1b21;
-  font-size: 18px;
-}
-
-.pet-id {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--app-primary);
-  background: var(--app-tag-bg);
-  border: 1px solid var(--app-tag-border);
-  border-radius: 999px;
-  padding: 3px 9px;
-}
-
-.left p {
-  margin: 3px 0;
-  color: var(--app-text-soft);
-  font-size: 13px;
-}
-
-.chain-text {
-  margin: 2px 0 4px;
-  color: var(--app-text-muted);
-  font-size: 12px;
-}
-
-.route-progress {
-  margin-top: 10px;
-}
-
-.route-progress-head {
-  display: flex;
-  justify-content: space-between;
-  color: var(--app-text-soft);
-  font-size: 13px;
-}
-
-.shiny-flow-card {
-  margin-top: 10px;
-}
-
-.shiny-flow-toolbar {
-  margin-top: 10px;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.shiny-flow-action-group {
-  display: inline-flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.shiny-flow-btn {
-  border: 1px solid rgba(148, 163, 184, 0.35);
-  background: #fff;
-  color: #334155;
-  border-radius: 10px;
-  height: 34px;
-  padding: 0 12px;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.shiny-flow-btn:hover {
-  border-color: rgba(59, 130, 246, 0.45);
-  color: #1d4ed8;
-}
-
-.shiny-flow-save-btn {
-  color: #0f766e;
-}
-
-.shiny-flow-wrap {
-  position: relative;
-  margin-top: 10px;
-  overflow: auto;
-  border-radius: 14px;
-  background: rgba(248, 250, 252, 0.9);
-  padding: 12px;
-}
-
-.shiny-flow-watermark {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  user-select: none;
-  z-index: 0;
-  overflow: hidden;
-}
-
-.shiny-flow-watermark span {
-  position: absolute;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 420px;
-  font-size: clamp(18px, 3.2vw, 34px);
-  font-weight: 800;
-  letter-spacing: 0.16em;
-  color: rgba(148, 163, 184, 0.14);
-  white-space: nowrap;
-}
 
-.shiny-flow-watermark span:nth-child(1) {
-  top: 10%;
-  left: 2%;
-  transform: rotate(-18deg);
-}
-
-.shiny-flow-watermark span:nth-child(2) {
-  top: 12%;
-  left: 48%;
-  transform: rotate(-16deg);
-}
-
-.shiny-flow-watermark span:nth-child(3) {
-  top: 36%;
-  left: -2%;
-  transform: rotate(-18deg);
-}
-
-.shiny-flow-watermark span:nth-child(4) {
-  top: 38%;
-  left: 44%;
-  transform: rotate(-16deg);
-}
-
-.shiny-flow-watermark span:nth-child(5) {
-  top: 62%;
-  left: 0;
-  transform: rotate(-18deg);
-}
-
-.shiny-flow-watermark span:nth-child(6) {
-  top: 64%;
-  left: 50%;
-  transform: rotate(-16deg);
-}
-
-.shiny-flow-watermark span:nth-child(7) {
-  top: 84%;
-  left: 8%;
-  transform: rotate(-18deg);
-}
-
-.shiny-flow-watermark span:nth-child(8) {
-  top: 86%;
-  left: 56%;
-  transform: rotate(-16deg);
-}
-
-.shiny-flow-preview-trigger {
-  cursor: zoom-in;
-}
-
-.shiny-flow-canvas {
-  position: relative;
-  z-index: 1;
-  min-width: 100%;
-}
-
-.shiny-flow-canvas :deep(svg) {
-  display: block;
-  width: 100%;
-  max-width: none;
-  height: auto;
-}
-
-.shiny-flow-preview-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  width: 100%;
-}
-
-.shiny-flow-preview-title {
-  min-width: 0;
-}
-
-.shiny-flow-preview-body {
-  height: calc(100vh - 92px);
-}
-
-.shiny-flow-wrap-preview {
-  height: 100%;
-  margin-top: 0;
-}
-
-@media (max-width: 768px) {
-  .shiny-flow-preview-title {
-    display: none;
-  }
-
-  .shiny-flow-preview-head {
-    justify-content: flex-end;
-  }
-
-  .gender-label-full {
-    display: none;
-  }
-
-  .gender-label-short {
-    display: inline;
-  }
-}
-
-.page.theme-dark .shiny-flow-card {
-}
-
-.page.theme-dark .shiny-flow-btn {
-  background: rgba(15, 23, 42, 0.92);
-  color: #e2e8f0;
-  border-color: rgba(71, 85, 105, 0.7);
-}
-
-.page.theme-dark .shiny-flow-btn:hover {
-  color: #93c5fd;
-  border-color: rgba(96, 165, 250, 0.7);
-}
-
-.page.theme-dark .shiny-flow-wrap {
-  background: rgba(2, 6, 23, 0.92);
-}
-
-.page.theme-dark .shiny-flow-watermark span {
-  color: rgba(148, 163, 184, 0.1);
-}
-
-.route-cards {
-  display: grid;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.route-card {
-  border: 1px solid var(--app-tag-border);
-  border-radius: 12px;
-  padding: 10px;
-  background: var(--app-item-bg);
-}
-
-.route-card.done {
-  border-color: #67c23a;
-  background: rgba(103, 194, 58, 0.08);
-}
-
-.route-card.can {
-  border-color: #409eff;
-  background: rgba(64, 158, 255, 0.1);
-}
 
-.route-card.blocked {
-  border-color: #f56c6c;
-  background: rgba(245, 108, 108, 0.1);
-}
-
-.sex-female {
-  color: #ec4899;
-  font-weight: 700;
-}
-
-.sex-male {
-  color: #2563eb;
-  font-weight: 700;
-}
-
-.switch-row {
-  display: flex;
-  align-items: center;
-  min-height: 40px;
-}
-
-.owned-add-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-}
-
-.owned-add-select {
-  width: 100%;
-}
-
-.owned-gender-group :deep(.el-radio-button__inner) {
-  min-width: 72px;
-  border-radius: 12px;
-}
-
-.gender-label-short {
-  display: none;
-}
-
-.owned-gender-female :deep(.el-radio-button__inner) {
-  color: #dc2626;
-  border-color: #fca5a5;
-  background: #fff1f2;
-}
-
-.owned-gender-female :deep(.el-radio-button__original-radio:checked + .el-radio-button__inner) {
-  color: #fff;
-  background: #ef4444;
-  border-color: #ef4444;
-  box-shadow: -1px 0 0 0 #ef4444;
-}
-
-.owned-gender-male :deep(.el-radio-button__inner) {
-  color: #1d4ed8;
-  border-color: #93c5fd;
-  background: #eff6ff;
-}
-
-.owned-gender-male :deep(.el-radio-button__original-radio:checked + .el-radio-button__inner) {
-  color: #fff;
-  background: #2563eb;
-  border-color: #2563eb;
-  box-shadow: -1px 0 0 0 #2563eb;
-}
-
-.owned-tag-female {
-  color: #dc2626 !important;
-  border-color: #fca5a5 !important;
-  background: #fff1f2 !important;
-}
-
-.owned-tag-male {
-  color: #1d4ed8 !important;
-  border-color: #93c5fd !important;
-  background: #eff6ff !important;
-}
-
-.owned-add-btn {
-  width: 42px !important;
-  height: 42px !important;
-  min-width: 42px !important;
-  border-radius: 999px !important;
-  padding: 0 !important;
-  display: inline-flex !important;
-  align-items: center;
-  justify-content: center;
-  justify-self: end;
-}
-
-.switch-hint {
-  margin: 8px 0 0;
-  font-size: 12px;
-  color: #7a7690;
-  line-height: 1.5;
-}
-
-.blocked-tip {
-  color: #e86a6a !important;
-  font-weight: 700;
-}
-
-.meta {
-  color: #7c7498;
-}
-
-.right {
-  display: grid;
-  gap: 8px;
-}
-
-.prob {
-  font-size: 20px;
-  font-weight: 800;
-  color: var(--app-primary);
-}
 
-.rank-enter-active,
-.rank-leave-active {
-  transition: all 0.35s ease;
-}
-
-.rank-enter-from,
-.rank-leave-to {
-  opacity: 0;
-  transform: translateY(10px) scale(0.985);
-}
-
-.rank-move {
-  transition: transform 0.35s ease;
-}
-
-:deep(.el-form-item__label) {
-  color: #1d4ed8 !important;
-  font-weight: 700;
-}
-
-:deep(.el-input__wrapper) {
-  border-radius: 14px;
-  background: #e8e7ef;
-  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.12) inset !important;
-  min-height: 42px;
-  align-items: center;
-}
 
-:deep(.el-input__wrapper:hover) {
-  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.16) inset !important;
-}
 
-:deep(.el-input__wrapper.is-focus) {
-  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.2) inset !important;
-}
 
-:deep(.el-input__inner) {
-  height: 42px;
-  line-height: 42px;
-}
 
-:deep(.el-input__inner:focus) {
-  outline: none !important;
-}
 
 .site-footer {
   max-width: 980px;
@@ -3296,102 +2357,32 @@ onBeforeUnmount(() => {
   font-weight: 600;
 }
 
-.footer-github-link {
+.footer-link {
   display: inline-flex;
   align-items: center;
-  gap: 0;
+  gap: 6px;
 }
 
 .site-footer a:hover {
   text-decoration: underline;
 }
 
-.footer-github-icon {
+.footer-link-icon {
   width: 1em;
   height: 1em;
   flex-shrink: 0;
 }
 
-.page.theme-dark .left h3,
-.page.theme-dark .group-pet-name {
-  color: var(--app-text);
-}
-
-.page.theme-dark .left p,
-.page.theme-dark .chain-text {
-  color: var(--app-text-soft);
-}
-
-.page.theme-dark .result-item {
-  background: #0b1220;
-  border-color: rgba(96, 165, 250, 0.28);
-  box-shadow: 0 12px 28px rgba(2, 6, 23, 0.55);
-}
-
-.page.theme-dark .exact-item {
-  background: linear-gradient(180deg, #1a2130, #121827);
-  border-color: rgba(248, 113, 113, 0.55);
-}
-
-.page.theme-dark .group-summary {
-  background: linear-gradient(180deg, #111827, #0b1220);
-  border-color: rgba(96, 165, 250, 0.35);
-}
-
-.page.theme-dark .pet-id {
-  color: #bfdbfe;
-  background: #172554;
-  border-color: #1d4ed8;
-}
-
-.page.theme-dark .empty,
 .page.theme-dark .site-footer {
   color: var(--app-text-muted);
 }
 
-.page.theme-dark :deep(.el-input__wrapper) {
-  background: #020617;
-  color: #e5e7eb;
-  box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.2) inset !important;
-}
+@media (max-width: 640px) {
+  .brand-short {
+    display: inline;
+  }
 
-.page.theme-dark :deep(.el-input__wrapper:hover) {
-  box-shadow: 0 0 0 1px rgba(147, 197, 253, 0.28) inset !important;
-}
-
-.page.theme-dark :deep(.el-input__wrapper.is-focus) {
-  box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.32) inset !important;
-}
-
-.page.theme-dark :deep(.el-input__inner) {
-  color: #f1f5f9;
-}
-
-.page.theme-dark :deep(.el-input__inner::placeholder) {
-  color: #94a3b8;
-}
-
-.page.theme-dark :deep(.el-form-item__label) {
-  color: #93c5fd !important;
-}
-
-.shiny-field :deep(.el-form-item__label),
-.page.shiny-active :deep(.el-form-item__label) {
-  color: #38bdf8 !important;
-}
-
-.page.shiny-active :deep(.el-input__wrapper) {
-  background: #e0f2fe;
-  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.3) inset !important;
-}
-
-.page.theme-dark.shiny-active :deep(.el-input__wrapper) {
-  background: #082f49;
-  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.4) inset !important;
-}
-
-@media (max-width: 859px) {
-  .route-card .route-group-tag {
+  .brand-full {
     display: none;
   }
 }
@@ -3399,41 +2390,6 @@ onBeforeUnmount(() => {
 @media (min-width: 860px) {
   .top-nav {
     padding: 12px 16px;
-  }
-
-  .mode-switch-card {
-    padding: 12px;
-  }
-
-  .grid {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .actions {
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: flex-end;
-    gap: 12px;
-  }
-
-  .actions :deep(.el-button) {
-    flex: 0 0 auto;
-    width: auto;
-    min-width: 132px;
-  }
-
-  .result-item {
-    grid-template-columns: 1.2fr 0.8fr;
-    align-items: center;
-  }
-
-  .group-item,
-  .group-summary {
-    grid-template-columns: 1fr;
-  }
-
-  .group-result-list {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 </style>
