@@ -2421,6 +2421,20 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 640px) {
+  .page {
+    --app-bg:
+      linear-gradient(rgba(247, 251, 255, 0.78), rgba(237, 245, 255, 0.82)),
+      url('/周年庆贺图.png') center / cover no-repeat,
+      radial-gradient(circle at top left, #f7fbff, #edf5ff 58%, #e4f0ff);
+  }
+
+  .page.theme-dark {
+    --app-bg:
+      linear-gradient(rgba(2, 6, 23, 0.72), rgba(11, 18, 32, 0.82)),
+      url('/周年庆贺图.png') center / cover no-repeat,
+      radial-gradient(circle at top left, #020617, #0b1220 55%, #111827);
+  }
+
   .brand-short {
     display: inline;
   }

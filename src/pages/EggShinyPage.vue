@@ -1,9 +1,10 @@
 <script setup>
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import GenderMaleIcon from '../components/icons/GenderMaleIcon.vue'
 import GenderFemaleIcon from '../components/icons/GenderFemaleIcon.vue'
 import '../styles/tool-pages.css'
 
-defineProps({
+const props = defineProps({
   loadingData: {
     type: Boolean,
     default: false
@@ -86,6 +87,41 @@ function updateShinyOwnedDraftName(value) {
 function updateShinyOwnedDraftGender(value) {
   emit('update:shinyOwnedDraftGender', value)
 }
+
+const isMobileViewport = ref(false)
+const shinyFlowCollapsed = ref(false)
+
+function syncMobileViewport() {
+  if (typeof window === 'undefined') return
+  isMobileViewport.value = window.innerWidth <= 640
+}
+
+watch(
+  () => [props.shinyHasSearched, props.shinyFlowSvg],
+  ([hasSearched, flowSvg]) => {
+    if (!flowSvg) {
+      shinyFlowCollapsed.value = false
+      return
+    }
+
+    if (isMobileViewport.value && hasSearched) {
+      shinyFlowCollapsed.value = true
+    }
+  }
+)
+
+onMounted(() => {
+  syncMobileViewport()
+  if (typeof window !== 'undefined') {
+    window.addEventListener('resize', syncMobileViewport)
+  }
+})
+
+onBeforeUnmount(() => {
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('resize', syncMobileViewport)
+  }
+})
 </script>
 
 <template>
@@ -204,7 +240,20 @@ function updateShinyOwnedDraftGender(value) {
           <div v-else-if="!shinyResult" class="empty">暂无可规划数据</div>
           <div v-else>
             <div v-if="shinyResult.routePlan" class="shiny-flow-card">
-              <div v-if="shinyFlowSvg" class="shiny-flow-wrap shiny-flow-preview-trigger" @click="emit('open-preview')">
+              <button
+                v-if="shinyFlowSvg && isMobileViewport"
+                type="button"
+                class="shiny-flow-collapse-btn"
+                @click="shinyFlowCollapsed = !shinyFlowCollapsed"
+              >
+                {{ shinyFlowCollapsed ? '展开流程图预览' : '收起流程图预览' }}
+              </button>
+
+              <div
+                v-if="shinyFlowSvg && (!isMobileViewport || !shinyFlowCollapsed)"
+                class="shiny-flow-wrap shiny-flow-preview-trigger"
+                @click="emit('open-preview')"
+              >
                 <div class="shiny-flow-watermark" aria-hidden="true">
                   <span>洛克星盘 · 异色路线规划</span>
                   <span>洛克星盘 · 异色路线规划</span>
@@ -325,6 +374,24 @@ function updateShinyOwnedDraftGender(value) {
 .shiny-flow-card {
   margin-top: 0;
   margin-bottom: 12px;
+}
+
+.shiny-flow-collapse-btn {
+  display: none;
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.7);
+  color: #334155;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 8px 18px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
 }
 
 .shiny-flow-action-group {
@@ -590,6 +657,14 @@ function updateShinyOwnedDraftGender(value) {
 
   .gender-label-short {
     display: inline;
+  }
+}
+
+@media (max-width: 640px) {
+  .shiny-flow-collapse-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 
