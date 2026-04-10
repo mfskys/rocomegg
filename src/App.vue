@@ -667,16 +667,18 @@ function downloadDataUrl(dataUrl, fileName = 'rocom-share.png') {
   document.body.removeChild(a)
 }
 
-function buildShareFileName() {
-  const normalize = (value) => {
-    const text = String(value ?? '').trim()
-    if (!text) return 'na'
-    return text.replace(/[^\d.]+/g, '_').replace(/_+/g, '_')
+function createRandomFileToken() {
+  if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
+    const bytes = new Uint8Array(6)
+    crypto.getRandomValues(bytes)
+    return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('')
   }
 
-  const d = normalize(diameterInput.value)
-  const w = normalize(weightInput.value)
-  return `rocom-share_d${d}_w${w}.png`
+  return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`
+}
+
+function buildRandomPngFileName(prefix = 'rocom-image') {
+  return `${prefix}-${createRandomFileToken()}.png`
 }
 
 async function onDownloadShareImage() {
@@ -684,7 +686,7 @@ async function onDownloadShareImage() {
     ElMessage.warning('暂无可下载图片，请先生成分享长图')
     return
   }
-  downloadDataUrl(shareImageUrl.value, buildShareFileName())
+  downloadDataUrl(shareImageUrl.value, buildRandomPngFileName('rocom-share'))
 }
 
 function buildShareQueryUrl() {
@@ -1591,7 +1593,7 @@ async function downloadShinyFlowPng() {
     ctx.fillRect(0, 0, width, height)
     ctx.drawImage(image, 0, 0, width, height)
 
-    downloadDataUrl(canvas.toDataURL('image/png'), 'rocom-shiny-flow.png')
+    downloadDataUrl(canvas.toDataURL('image/png'), buildRandomPngFileName('rocom-shiny-flow'))
   } catch (err) {
     console.error(err)
     ElMessage.warning(`PNG 导出失败：${err instanceof Error ? err.message : '请重试'}`)
