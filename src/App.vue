@@ -2203,16 +2203,11 @@ onBeforeUnmount(() => {
                     ×
                 </button>
             </div>
-            <a
-                class="official-activity-link"
-                href="https://www.wegame.com.cn/act/wegame/lkwgsj20260409launch/index.html?wg_ad_from=communitycoverNew"
-                target="_blank"
-                rel="noopener noreferrer"
-            >
+            <div class="official-activity-link">
                 <span class="official-activity-name"
-                    >洛克王国世界启动签到领好礼</span
+                    >网页停止维护，微信小程序：洛克星盘 可进行查询及投稿</span
                 >
-            </a>
+            </div>
         </section>
 
         <HomePage v-if="currentPage === 'home'" @navigate="navigateTo" />
