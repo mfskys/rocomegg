@@ -21,7 +21,7 @@
     "vue-router": "^5.0.4"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^6.0.5",
+    "@vitejs/plugin-vue": "^6.0.6",
     "gh-pages": "^6.3.0",
     "sharp": "^0.34.5",
     "vite": "^8.0.8"
